@@ -5,7 +5,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
 
-namespace OurGame.Api;
+namespace SquareGrid.Api;
 
 internal sealed class JwtBearerValidationMiddleware : IFunctionsWorkerMiddleware
 {

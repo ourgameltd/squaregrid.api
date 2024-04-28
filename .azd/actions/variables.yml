@@ -1,6 +1,6 @@
 variables:
-  version: '0.1.0'
-  appConfigName: 'acourgame'
-  environment: 'Dev'
-  serviceConnection: 'OurGame Dev/Test'
+  version: "0.1.0"
+  appConfigName: "acSquareGrid"
+  environment: "Dev"
+  serviceConnection: "SquareGrid Dev/Test"
   System.Debug: false

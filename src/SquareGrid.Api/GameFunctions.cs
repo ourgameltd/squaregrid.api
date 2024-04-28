@@ -26,6 +26,12 @@ namespace SquareGrid.Api
         {
             var game = await tableManager.GetAsync<SquareGridGame>(userId, gameId);
 
+            if (game == null)
+            {
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound);
+                return notFoundResponse;
+            }
+
             var okResponse = req.CreateResponse(HttpStatusCode.OK);
             await okResponse.WriteAsJsonAsync(game);
             return okResponse;

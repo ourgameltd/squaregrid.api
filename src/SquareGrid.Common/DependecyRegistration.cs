@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SquareGrid.Common.Services.Tables.Models;
 
-namespace OurGame.Common
+namespace SquareGrid.Common
 {
     public static class DependencyRegistration
     {

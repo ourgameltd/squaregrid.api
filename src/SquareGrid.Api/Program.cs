@@ -6,8 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using OurGame.Api;
-using OurGame.Common;
+using SquareGrid.Api;
+using SquareGrid.Common;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults((worker) =>

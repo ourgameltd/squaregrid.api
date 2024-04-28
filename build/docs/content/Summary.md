@@ -8,7 +8,7 @@
 
 | Name | Devops Environment | Url | Resource Group |
 |--|--|--|--|
-| Dev | [dev](https://mlwdltd.visualstudio.com/OurGame/_environments/10?view=deployments) | TBC | TBC |
+| Dev | [dev](https://mlwdltd.visualstudio.com/SquareGrid/_environments/10?view=deployments) | TBC | TBC |
 | Live |  |  |
 
 ## Features
@@ -22,15 +22,15 @@
 
 
 ## Accounts, Subscriptions & environments
-* OurGame Live Subscription
-* [OurGame Dev/Test Subscription](https://portal.azure.com/#@michaellaw.me/resource/subscriptions/a3ac85e7-ff10-4e73-b806-3ab91af8f0c4/overview)
-* [Azure Devops Project](https://mlwdltd.visualstudio.com/OurGame)
+* SquareGrid Live Subscription
+* [SquareGrid Dev/Test Subscription](https://portal.azure.com/#@michaellaw.me/resource/subscriptions/a3ac85e7-ff10-4e73-b806-3ab91af8f0c4/overview)
+* [Azure Devops Project](https://mlwdltd.visualstudio.com/SquareGrid)
 * [PR Pipeline]() - Runs on PR to master
 * [Deployment Pipeline]() - Manual run to deploy code
 * [Repo]()
 * [Wiki]() - Managed via source /build/docs/content
-* [App config](https://portal.azure.com/#@michaellaw.me/resource/subscriptions/a3ac85e7-ff10-4e73-b806-3ab91af8f0c4/resourceGroups/Landing-Zones-Default/providers/Microsoft.AppConfiguration/configurationStores/acourgame/overview)
-* [Pipeline Environment Approval config](https://mlwdltd.visualstudio.com/OurGame/_environments)
+* [App config](https://portal.azure.com/#@michaellaw.me/resource/subscriptions/a3ac85e7-ff10-4e73-b806-3ab91af8f0c4/resourceGroups/Landing-Zones-Default/providers/Microsoft.AppConfiguration/configurationStores/acSquareGrid/overview)
+* [Pipeline Environment Approval config](https://mlwdltd.visualstudio.com/SquareGrid/_environments)
 
 ## Team Members
 

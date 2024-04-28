@@ -1,5 +1,6 @@
-# OurGame
-This is the repo for details the backend Api, Integrations and Ui for the OurGame app.
+# SquareGrid
+
+This is the repo for details the backend Api, Integrations and Ui for the SquareGrid app.
 
 |Pipeline|Status|
 |--------|------|
