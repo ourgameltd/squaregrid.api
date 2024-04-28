@@ -1,0 +1,58 @@
+@baseUrl = http://localhost:7059/api
+@token = 'Bearer '
+
+###
+
+GET {{baseUrl}}/game/d3b07384-d113-4ec8-98c1-eb1a5c48f0b7/f3b07384-d113-4ec8-98c1-eb1a5c48f0b1 HTTP/1.1
+Accept: application/json
+Authorization: {{token}}
+
+###
+
+GET {{baseUrl}}/game/d3b07384-d113-4ec8-98c1-eb1a5c48f0b7 HTTP/1.1
+Accept: application/json
+Authorization: {{token}}
+
+###
+
+PUT {{baseUrl}}/game HTTP/1.1
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "partitionKey": "d3b07384-d113-4ec8-98c1-eb1a5c48f0b7",
+  "rowKey": "f3b07384-d113-4ec8-98c1-eb1a5c48f0b1",
+  "title": "Epic Space Adventure",
+  "image": "https://example.com/images/space-adventure.png",
+  "description": "An epic game of exploration and battles in the vastness of space.",
+  "published": false,
+  "blocks": 50,
+  "blocksClaimed": 0,
+  "blocksRemaining": 50,
+  "isCompleted": false,
+  "isWon": false,
+  "timestamp": "2024-04-01T22:13:35.4574199+00:00",
+  "eTag": "W/\"datetime'2024-04-01T22%3A13%3A35.4574199Z'\""
+}
+
+###
+
+POST {{baseUrl}}/game HTTP/1.1
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "partitionKey": "d3b07384-d113-4ec8-98c1-eb1a5c48f0b7",
+  "rowKey": "f3b07384-d113-4ec8-98c1-eb1a5c48f0b1",
+  "title": "Michaels Game",
+  "image": "https://example.com/images/space-adventure.png",
+  "description": "An epic game of exploration and battles in the vastness of space.",
+  "published": false,
+  "blocks": 50,
+  "blocksClaimed": 0,
+  "blocksRemaining": 50,
+  "isCompleted": false,
+  "isWon": false,
+  "timestamp": "2024-04-01T22:30:28.3893476+00:00",
+  "eTag": "W/\"datetime'2024-04-01T22%3A30%3A28.3893476Z'\""
+}

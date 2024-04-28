@@ -1,0 +1,59 @@
+parameters:
+- name: serviceConnection
+- name: subscriptionId
+- name: storageAccountName
+- name: containerName
+- name: workingDirectory
+- name: environment
+- name: db_username
+- name: db_password
+- name: keyVaultName
+- name: appConfigName
+
+steps:
+- task: PublishPipelineArtifact@1
+  displayName: 'Terraform : Publish'
+  inputs:
+    path: '${{ parameters.workingDirectory }}'
+    artifact: infra
+
+- task: TerraformCLI@1
+  displayName: 'Install Terraform'
+  inputs:
+    terraformVersion: 'latest'
+
+- task: TerraformCLI@1
+  displayName: 'Terraform Init'
+  inputs:
+    command: init
+    workingDirectory: ${{ parameters.workingDirectory }}
+    backendType: azurerm
+    backendServiceArm: ${{ parameters.serviceConnection }}
+    backendAzureRmSubscriptionId: ${{ parameters.subscriptionId }}
+    backendAzureRmResourceGroupLocation: 'westeurope'
+    ensureBackend: true
+    backendAzureRmResourceGroupName: 'Landing-Zones-Default'
+    backendAzureRmStorageAccountName: ${{ parameters.storageAccountName }}
+    backendAzureRmContainerName: ${{ parameters.containerName }}
+    backendAzureRmKey: 'ourgame.tfstate'
+
+- task: TerraformCLI@1
+  displayName: 'Terraform Validate'
+  inputs:
+    command: 'validate'
+    workingDirectory: ${{ parameters.workingDirectory }}
+
+- task: TerraformCLI@1
+  displayName: 'Terraform Plan'
+  inputs:
+    command: 'plan'
+    workingDirectory: ${{ parameters.workingDirectory }}
+    environmentServiceName: ${{ parameters.serviceConnection }}
+    commandOptions: '
+      -var="environment=${{ parameters.environment }}" 
+      -var="kv_name=${{ parameters.keyVaultName }}" 
+      -var="ac_name=${{ parameters.appConfigName }}" 
+      -var="db_username=${{ parameters.db_username }}" 
+      -var="db_password=${{ parameters.db_password }}"
+      -out=tfplan'
+    publishPlanResults: 'tfplan'

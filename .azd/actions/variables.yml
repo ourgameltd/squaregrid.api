@@ -1,0 +1,6 @@
+variables:
+  version: '0.1.0'
+  appConfigName: 'acourgame'
+  environment: 'Dev'
+  serviceConnection: 'OurGame Dev/Test'
+  System.Debug: false
