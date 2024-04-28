@@ -20,7 +20,6 @@ internal sealed class JwtBearerValidationMiddleware : IFunctionsWorkerMiddleware
         else
         {
             var res = requestData!.CreateResponse(HttpStatusCode.Unauthorized);
-            await res.WriteStringAsync("No Authorization header provided.");
             context.GetInvocationResult().Value = res;
             return;
         }
