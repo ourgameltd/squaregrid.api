@@ -6,8 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using OurGame.Api;
-using OurGame.Common;
+using SquareGrid.Api;
+using SquareGrid.Api.Middleware.Tokens;
+using SquareGrid.Common;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults((worker) =>
@@ -22,6 +23,9 @@ var host = new HostBuilder()
     })
     .ConfigureServices((hostBuilderContext, services) =>
     {
+        services.AddMemoryCache();
+        services.AddTransient<B2CConfigurationManager>();
+
         _ = services
             .AddSingleton<IOpenApiConfigurationOptions>(_ =>
             {

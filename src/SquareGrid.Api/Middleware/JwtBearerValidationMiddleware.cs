@@ -1,21 +1,42 @@
 using System.Net;
 using System.Reflection;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using SquareGrid.Api.Middleware.Tokens;
 
-namespace OurGame.Api;
+namespace SquareGrid.Api;
 
 internal sealed class JwtBearerValidationMiddleware : IFunctionsWorkerMiddleware
 {
+    private readonly B2CConfigurationManager configurationManager;
+
+    public JwtBearerValidationMiddleware(B2CConfigurationManager configurationManager)
+    {
+        this.configurationManager = configurationManager;
+    }
+
     public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
     {
         var requestData = await context.GetHttpRequestDataAsync();
 
         if (requestData!.Headers.TryGetValues("Authorization", out var values))
         {
-            var token = values.First().Replace("Bearer ", "");
+            try
+            {
+                var token = values.First().Replace("Bearer ", "");
+                var user = await configurationManager.ValidateToken(token);
+                context.Items.Add(nameof(ClaimsPrincipal), user);
+            }
+            catch (Exception)
+            {
+                var res = requestData!.CreateResponse(HttpStatusCode.Unauthorized);
+                await res.WriteStringAsync("No Authorization header provided.");
+                context.GetInvocationResult().Value = res;
+                return;
+            }
         }
         else
         {

@@ -1,11 +1,14 @@
 {
   "profiles": {
-    "OurGame.Api": {
+    "SquareGrid.Api": {
       "commandName": "Project",
       "commandLineArgs": "--port 7059",
       "launchBrowser": false,
       "environmentVariables": {
-        "BlobStorageConnection": "UseDevelopmentStorage=true"
+        "BlobStorageConnection": "UseDevelopmentStorage=true",
+        "B2CAuthority": "https://ourgameauth.b2clogin.com/ourgameauth.onmicrosoft.com/B2C_1_SUSI/v2.0/",
+        "B2CIssuer": "https://ourgameauth.b2clogin.com/60b00a0a-88d4-42ed-9a05-2a56a0da259f/v2.0/",
+        "B2CClientId": "017c1045-b0db-4e87-bc13-87d68dce0185"
       }
     }
   }

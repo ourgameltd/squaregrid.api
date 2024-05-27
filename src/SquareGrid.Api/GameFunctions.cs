@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -19,12 +20,13 @@ namespace SquareGrid.Api
         }
 
         [Function(nameof(GetGame))]
+        [Authorize]
         public async Task<HttpResponseData> GetGame(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "game/{userId}/{gameId}")] HttpRequestData req,
-            string userId,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "games/{gameId}")] HttpRequestData req, FunctionContext ctx,
             string gameId)
         {
-            var game = await tableManager.GetAsync<SquareGridGame>(userId, gameId);
+            var user = ctx.GetUser();
+            var game = await tableManager.GetAsync<SquareGridGame>(user.ObjectId, gameId);
 
             var okResponse = req.CreateResponse(HttpStatusCode.OK);
             await okResponse.WriteAsJsonAsync(game);
@@ -32,11 +34,12 @@ namespace SquareGrid.Api
         }
 
         [Function(nameof(GetGames))]
+        [Authorize]
         public async Task<HttpResponseData> GetGames(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "game/{userId}")] HttpRequestData req,
-            string userId)
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "games")] HttpRequestData req, FunctionContext ctx)
         {
-            var games = await tableManager.GetAllAsync<SquareGridGame>(userId);
+            var user = ctx.GetUser();
+            var games = await tableManager.GetAllAsync<SquareGridGame>(user.ObjectId);
 
             var okResponse = req.CreateResponse(HttpStatusCode.OK);
             await okResponse.WriteAsJsonAsync(games);
@@ -44,9 +47,11 @@ namespace SquareGrid.Api
         }
 
         [Function(nameof(PutGame))]
+        [Authorize]
         public async Task<HttpResponseData> PutGame(
-            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "game")] HttpRequestData req)
+            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "games")] HttpRequestData req, FunctionContext ctx)
         {
+            var user = ctx.GetUser();
             var data = await req.GetFromBodyValidated<SquareGridGame>();
 
             if (!data.IsValid)
@@ -54,15 +59,18 @@ namespace SquareGrid.Api
                 return data.HttpResponseData!;
             }
 
-            await tableManager.Insert(data.Body!);
+            data.Body!.PartitionKey = user.ObjectId;
 
+            await tableManager.Insert(data.Body!);
             return req.CreateResponse(HttpStatusCode.Created);
         }
 
         [Function(nameof(PostGame))]
+        [Authorize]
         public async Task<HttpResponseData> PostGame(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "game")] HttpRequestData req)
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "games")] HttpRequestData req, FunctionContext ctx)
         {
+            var user = ctx.GetUser();
             var data = await req.GetFromBodyValidated<SquareGridGame>();
 
             if (!data.IsValid)
@@ -70,8 +78,9 @@ namespace SquareGrid.Api
                 return data.HttpResponseData!;
             }
 
-            await tableManager.Update(data.Body!);
+            data.Body!.PartitionKey = user.ObjectId;
 
+            await tableManager.Update(data.Body!);
             return req.CreateResponse(HttpStatusCode.Created);
         }
     }
