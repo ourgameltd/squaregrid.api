@@ -2,7 +2,7 @@
 terraform {
   backend "azurerm" {
     resource_group_name  = "Landing-Zones-Default"
-    key                  = "ourgame.tfstate"
+    key                  = "SquareGrid.tfstate"
   }
   required_providers {
     azapi = {
@@ -58,9 +58,9 @@ variable "db_sku" {
 locals {
   landingZoneRg = "Landing-Zones-Default"
   region = "westeurope"
-  suffix = "ourgame${lower(var.environment)}"
+  suffix = "SquareGrid${lower(var.environment)}"
   tags = {
-    Application      = "OurGame"
+    Application      = "SquareGrid"
     Owner            = "Michael Law"
     Environment      = var.environment
     SharedResource   = "No"

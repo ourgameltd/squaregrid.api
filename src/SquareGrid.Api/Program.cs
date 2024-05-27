@@ -36,7 +36,7 @@ var host = new HostBuilder()
                     Info = new OpenApiInfo()
                     {
                         Version = version,
-                        Title = $"SquareGrid Api",
+                        Title = $"Square Grid Api",
                         Description = "Api calls and message processing functions for the SquareGrid app",
                     },
                     Servers = DefaultOpenApiConfigurationOptions.GetHostNames(),

@@ -1,6 +1,6 @@
 ## Development Pre-requisites
 * Install Visual Studio 2022 (dotnet 7)
-* Have IAM Contributor access to the [OurGame Dev/Test](https://portal.azure.com/#@michaellaw.me/resource/subscriptions/a3ac85e7-ff10-4e73-b806-3ab91af8f0c4/overview) Subscription
+* Have IAM Contributor access to the [SquareGrid Dev/Test](https://portal.azure.com/#@michaellaw.me/resource/subscriptions/a3ac85e7-ff10-4e73-b806-3ab91af8f0c4/overview) Subscription
 
 ## New Environment Pre-requisites
 When setting up a new environment there are some things which need to be configured manually prior to starting by infrastructure and cloud ops.

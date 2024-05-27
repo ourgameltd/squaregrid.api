@@ -1,6 +1,6 @@
 {
-    "azureFunctions.projectSubpath": "src/OurGame.Api",
-    "azureFunctions.deploySubpath": "src/OurGame.Api/bin/Release/net8.0/publish",
+    "azureFunctions.projectSubpath": "src/SquareGrid.Api",
+    "azureFunctions.deploySubpath": "src/SquareGrid.Api/bin/Release/net8.0/publish",
     "azureFunctions.projectLanguage": "C#",
     "azureFunctions.projectRuntime": "~4",
     "debug.internalConsoleOptions": "neverOpen",

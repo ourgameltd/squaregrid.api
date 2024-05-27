@@ -1,6 +1,6 @@
 {
-  "name": "OurGame: Design",
-  "state": "ourgame.tfstate",
+  "name": "SquareGrid: Design",
+  "state": "SquareGrid.tfstate",
   "storage-azure": {
     "subscription-id": "a3ac85e7-ff10-4e73-b806-3ab91af8f0c4",
     "resource-group": "Landing-Zones-Default",
