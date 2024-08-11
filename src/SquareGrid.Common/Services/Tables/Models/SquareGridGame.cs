@@ -36,6 +36,12 @@ namespace SquareGrid.Common.Services.Tables.Models
         public required string Description { get; set; }
 
         /// <summary>
+        /// Options for the game
+        /// </summary>
+        [Required]
+        public required string Options { get; set; }
+
+        /// <summary>
         /// Decide if its public
         /// </summary>
         public required bool Published { get; set; }

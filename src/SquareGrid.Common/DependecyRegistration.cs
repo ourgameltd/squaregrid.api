@@ -15,6 +15,7 @@ namespace SquareGrid.Common
             var containerClient = blobServiceClient.GetBlobContainerClient("media");
             containerClient.CreateIfNotExists();
             services.AddSingleton(blobServiceClient);
+            services.AddSingleton(new MediaBlobManager(blobServiceClient));
 
             var tableServiceClient = new TableServiceClient(connectionString);
             var tableGameClient = tableServiceClient.GetTableClient(nameof(SquareGridGame));
