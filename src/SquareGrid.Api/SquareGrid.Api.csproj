@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
 	  <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="7.0.0" />
+	  <PackageReference Include="HttpMultipartParser" Version="8.4.0" />
 	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
 	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
 	  <PackageReference Include="Microsoft.Azure.AppConfiguration.Functions.Worker" Version="6.1.0" />

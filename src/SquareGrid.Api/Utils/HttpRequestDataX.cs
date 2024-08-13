@@ -1,5 +1,4 @@
 ﻿using Microsoft.Azure.Functions.Worker.Http;
-using SquareGrid.Common.Services.Tables.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 

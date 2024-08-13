@@ -34,5 +34,9 @@
 		<PackageReference Include="System.Data.OleDb" Version="7.0.0" />
 		<PackageReference Include="System.Security.Permissions" Version="7.0.0" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="NewFolder\" />
+	</ItemGroup>
   
 </Project>
