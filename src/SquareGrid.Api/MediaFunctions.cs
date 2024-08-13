@@ -4,13 +4,7 @@ using Microsoft.Extensions.Logging;
 using SquareGrid.Api.Utils;
 using SquareGrid.Common.Services.Tables.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Extensions;
 using System.Net;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.WebUtilities;
-using System.Linq;
-using Microsoft.Extensions.Primitives;
 using HttpMultipartParser;
 
 namespace SquareGrid.Api
