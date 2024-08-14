@@ -18,7 +18,7 @@ namespace SquareGrid.Api.Utils
                 throw new InvalidDataException("No user data available in cache.");
             }
 
-            var claimsPrincipal = (ClaimsPrincipal)princpal;
+            var claimsPrincipal = princpal as ClaimsPrincipal;
 
             if (claimsPrincipal == null)
             {
@@ -28,6 +28,34 @@ namespace SquareGrid.Api.Utils
             if (forceAuthenticated && claimsPrincipal.Identity?.IsAuthenticated == false)
             {
                 throw new InvalidDataException("Claims principal is valid but must be authenticated.");
+            }
+
+            return new User(claimsPrincipal);
+        }
+
+
+        public static User? GetUserIfPopulated(this FunctionContext ctx, bool forceAuthenticated = true)
+        {
+            if (ctx == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            if (!ctx.Items.TryGetValue(nameof(ClaimsPrincipal), out object? princpal))
+            {
+                return null;
+            }
+
+            var claimsPrincipal = princpal as ClaimsPrincipal;
+
+            if (claimsPrincipal == null)
+            {
+                return null;
+            }
+
+            if (forceAuthenticated && claimsPrincipal.Identity?.IsAuthenticated == false)
+            {
+                return null;
             }
 
             return new User(claimsPrincipal);

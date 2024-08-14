@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SquareGrid.Api.Models.Requests
+namespace SquareGrid.Api.Functions.Models.Requests
 {
     internal class PutBlockRequest
     {

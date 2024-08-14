@@ -51,11 +51,6 @@ namespace SquareGrid.Common.Services.Tables.Models
         public bool IsClaimed => DateClaimed.HasValue;
 
         /// <summary>
-        /// Owner of the SquareGridGame can confirm its claimed
-        /// </summary>
-        public bool ConfirmedByOwner { get; set; } = false;
-
-        /// <summary>
         /// Date the block was confirmed
         /// </summary>
         public DateTime? DateConfirmed { get; set; }

@@ -103,6 +103,25 @@ namespace SquareGrid.Common.Services.Tables.Models
             }
         }
 
+        /// <summary>
+        /// Pick a winner for this game
+        /// </summary>
+        /// <returns></returns>
+        public SquareGridBlock? PickAWinner()
+        {
+            var confirmedBlocks = Blocks.Where(o => o.IsConfirmed).ToList();
+
+            if (confirmedBlocks.Count == 0)
+            {
+                return null;
+            }
+
+            Random random = new Random();
+
+            int randomIndex = random.Next(confirmedBlocks.Count);
+            return confirmedBlocks[randomIndex];
+        }
+
         public DateTimeOffset? Timestamp { get; set; }
 
         public ETag ETag { get; set; }

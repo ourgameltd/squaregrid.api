@@ -25,7 +25,7 @@ namespace SquareGrid.Api.Functions
         /// <param name="userId"></param>
         /// <returns></returns>
         /// <exception cref="SquareGridException"></exception>
-        protected async Task<SquareGridGame> GetGameByUser(FunctionContext ctx, string gameId, string? userId = null)
+        protected async Task<SquareGridGame> GetGameByUserOrThrow(FunctionContext ctx, string gameId, string? userId = null)
         {
             if (string.IsNullOrWhiteSpace(userId))
             {

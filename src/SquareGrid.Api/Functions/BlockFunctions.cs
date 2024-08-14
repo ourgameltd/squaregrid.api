@@ -6,9 +6,10 @@ using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using SquareGrid.Api.Functions;
-using SquareGrid.Api.Models.Requests;
+using SquareGrid.Api.Functions.Models.Requests;
 using SquareGrid.Api.Utils;
 using SquareGrid.Common.Exceptions;
+using SquareGrid.Common.Models;
 using SquareGrid.Common.Services.Tables.Models;
 using System.Net;
 
@@ -25,7 +26,7 @@ namespace SquareGrid.Api
             this.logger = logger;
         }
 
-        [OpenApiOperation(operationId: nameof(PutBlock), tags: ["block"], Summary = "Add a block for a game for the logged in user card.", Description = "Add a block for a game for the logged in user card.")]
+        [OpenApiOperation(operationId: nameof(PutBlock), tags: ["block"], Summary = "Add a block for a game for a logged in user.", Description = "Add a block for a game for a logged in user.")]
         [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(PutBlockRequest), Description = "A request model to add a block.")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
@@ -48,7 +49,7 @@ namespace SquareGrid.Api
 
             try
             {
-                game = await GetGameByUser(ctx, gameId);
+                game = await GetGameByUserOrThrow(ctx, gameId);
             }
             catch (SquareGridException)
             {
@@ -61,13 +62,117 @@ namespace SquareGrid.Api
                 Title = data.Body!.Title,
                 ClaimedByFriendlyName = data.Body?.ClaimedBy,
                 DateClaimed = data.Body?.ClaimedBy != null ? DateTime.UtcNow : null,
-                ConfirmedByOwner = data.Body!.Confirmed,
                 DateConfirmed = data.Body!.Confirmed ? DateTime.UtcNow : null,
                 PartitionKey = game.RowKey,
                 RowKey = Guid.NewGuid().ToString()
             };
 
             await tableManager.Insert(newBlock);
+            return req.CreateResponse(HttpStatusCode.NoContent);
+        }
+
+        [OpenApiOperation(operationId: nameof(DeleteBlock), tags: ["block"], Summary = "Delete a block on a game for a logged in user.", Description = "Delete a block on a game for a logged in user.")]
+        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
+        [Function(nameof(DeleteBlock))]
+        [Authorize]
+        public async Task<HttpResponseData> DeleteBlock(
+            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "games/{gameId}/block/{blockId}")] HttpRequestData req, FunctionContext ctx,
+            string gameId,
+            string blockId)
+        {
+            var user = ctx.GetUser();
+
+            SquareGridGame game;
+
+            try
+            {
+                game = await GetGameByUserOrThrow(ctx, gameId);
+            }
+            catch (SquareGridException)
+            {
+                return req.CreateResponse(HttpStatusCode.Forbidden);
+            }
+
+            await tableManager.DeleteAsync<SquareGridBlock>(gameId, blockId);
+            return req.CreateResponse(HttpStatusCode.NoContent);
+        }
+
+        [OpenApiOperation(operationId: nameof(ClaimBlock), tags: ["block"], Summary = "Claim a block on a game.", Description = "Claim a block on a game.")]
+        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
+        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(ClaimBlockRequest), Description = "A request model to claim a block thats free.")]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Conflict)]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
+        [Function(nameof(ClaimBlock))]
+        public async Task<HttpResponseData> ClaimBlock(
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "games/{gameId}/block/{blockId}/claim")] HttpRequestData req, FunctionContext ctx,
+            string gameId,
+            string blockId)
+        {
+
+            User? user = ctx.GetUserIfPopulated();
+            var data = await req.GetFromBodyValidated<PutBlockRequest>();
+
+            if (!data.IsValid)
+            {
+                return data.HttpResponseData!;
+            }
+
+            SquareGridBlock? block = await tableManager.GetAsync<SquareGridBlock>(gameId, blockId);
+            
+            if (block == null)
+            {
+                return req.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            if (block.IsClaimed)
+            {
+                return req.CreateResponse(HttpStatusCode.Conflict);
+            }
+
+            block.ClaimedByFriendlyName = data.Body?.ClaimedBy;
+            block.DateClaimed = DateTime.UtcNow;
+
+            if (Guid.TryParse(user?.ObjectId, out Guid guid))
+            {
+                block.ClaimedByUserId = guid;
+            }
+
+            await tableManager.Update(block);
+            return req.CreateResponse(HttpStatusCode.NoContent);
+        }
+
+        [OpenApiOperation(operationId: nameof(ConfirmBlock), tags: ["block"], Summary = "Confirm a block on a game for a logged in user.", Description = "Conform a block on a game for a logged in user.")]
+        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Conflict)]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
+        [Function(nameof(ConfirmBlock))]
+        [Authorize]
+        public async Task<HttpResponseData> ConfirmBlock(
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "games/{gameId}/block/{blockId}/confirm")] HttpRequestData req, FunctionContext ctx,
+            string gameId,
+            string blockId)
+        {
+            User? user = ctx.GetUserIfPopulated();
+
+            SquareGridBlock? block = await tableManager.GetAsync<SquareGridBlock>(gameId, blockId);
+
+            if (block == null)
+            {
+                return req.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            if (!block.IsClaimed)
+            {
+                return req.CreateResponse(HttpStatusCode.BadRequest);
+            }
+
+            block.DateConfirmed = DateTime.UtcNow;
+
+            await tableManager.Update(block);
             return req.CreateResponse(HttpStatusCode.NoContent);
         }
     }
