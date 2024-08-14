@@ -36,55 +36,72 @@ namespace SquareGrid.Common.Services.Tables.Models
         public required string Description { get; set; }
 
         /// <summary>
-        /// Options for the game
+        /// Contains all blocks for this Game
         /// </summary>
-        [Required]
-        public required string Options { get; set; }
+        public List<SquareGridBlock> Blocks { get; private set; } = new List<SquareGridBlock>();
 
         /// <summary>
-        /// Decide if its public
+        /// Are are blocks now claimed
         /// </summary>
-        public required bool Published { get; set; }
+        public bool IsClaimed => Blocks.All(b => b.IsClaimed);
 
         /// <summary>
-        /// How many blocks does it include
+        /// Are all blocks claimed and confirmed
         /// </summary>
-        public required int Blocks { get; set; }
+        public bool IsCompleted => IsClaimed && Blocks.All(b => b.IsConfirmed);
 
         /// <summary>
-        /// How many blacks have been claimed by someone
+        /// Is this game won
         /// </summary>
-        public required int BlocksClaimed { get; set; }
+        public bool IsWon => Blocks.Any(b => b.IsWinner);
 
         /// <summary>
-        /// How many blocks are left
+        /// Won by user id
         /// </summary>
-        public int BlocksRemaining => Blocks - BlocksClaimed;
+        public Guid? WonById => Blocks.FirstOrDefault(b => b.IsWinner)?.ClaimedByUserId;
 
         /// <summary>
-        /// Which block was the winner
+        /// Won by display name
         /// </summary>
-        public string? WinnerBlock { get; set; }
+        public string? WonByName => Blocks.FirstOrDefault(b => b.IsWinner)?.ClaimedByFriendlyName;
 
         /// <summary>
-        /// Friendly id of registered winner
+        /// Won by date and time
         /// </summary>
-        public string? WinnerFriendlyName { get; set; }
+        public DateTime? WonByDate => Blocks.FirstOrDefault(b => b.IsWinner)?.DateClaimed;
 
         /// <summary>
-        /// User id of registered winner
+        /// Set the blocks for this card
         /// </summary>
-        public Guid? WinnerUserId { get; set; }
+        /// <param name="blocks"></param>
+        public void SetBlocks(IEnumerable<SquareGridBlock>? blocks)
+        {
+            Blocks = (blocks ?? new List<SquareGridBlock>()).ToList();
+        }
 
         /// <summary>
-        /// Is the game complete
+        /// Set the blocks for this card
         /// </summary>
-        public bool IsCompleted => BlocksRemaining <= 0;
+        /// <param name="blocks"></param>
+        public int GetNextAvailableBlockIndex()
+        {
+            HashSet<int> valuesSet = new HashSet<int>();
 
-        /// <summary>
-        /// Does the game have a winner picked
-        /// </summary>
-        public bool IsWon { get; set; } = false;
+            foreach (var block in Blocks)
+            {
+                valuesSet.Add(block.Index);
+            }
+
+            int expectedValue = 1;
+            while (true)
+            {
+                if (!valuesSet.Contains(expectedValue))
+                {
+                    return expectedValue;
+                }
+                expectedValue++;
+            }
+        }
 
         public DateTimeOffset? Timestamp { get; set; }
 

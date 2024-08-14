@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Net;
 using HttpMultipartParser;
 
-namespace SquareGrid.Api
+namespace SquareGrid.Api.Functions
 {
     public class MediaFunctions
     {

@@ -54,8 +54,9 @@ Authorization: {{authToken}}
   "blocksRemaining": 50,
   "isCompleted": false,
   "isWon": false,
+  "options": "Real Madrid, AC Milan, Liverpool, Bayern Munich, Barcelona, Ajax, Manchester United, Inter Milan, Juventus, Benfica, Chelsea, Nottingham Forest, Porto, Celtic, Hamburg, Steaua Bucharest, Borussia Dortmund, Marseille, Feyenoord, Aston Villa, PSV Eindhoven, Red Star Belgrade, Manchester City, Feyenoord, Eintracht Frankfurt, Celtic, Feyenoord, Red Star Belgrade, Ajax, Benfica, Chelsea, Borussia Dortmund, Nottingham Forest, Steaua Bucharest, Hamburg, Marseille",
   "timestamp": "2024-04-01T22:13:35.4574199+00:00",
-  "eTag": "W/\"datetime'2024-04-01T22%3A13%3A35.4574199Z'\""
+  "eTag": "W/\"datetime'2024-06-07T20%3A19%3A14.8098563Z'\""
 }
 
 ###
@@ -77,8 +78,9 @@ Authorization: {{authToken}}
   "blocksRemaining": 50,
   "isCompleted": false,
   "isWon": false,
+  "options": "Real Madrid, AC Milan, Liverpool, Bayern Munich, Barcelona, Ajax, Manchester United, Inter Milan, Juventus, Benfica, Chelsea, Nottingham Forest, Porto, Celtic, Hamburg, Steaua Bucharest, Borussia Dortmund, Marseille, Feyenoord, Aston Villa, PSV Eindhoven, Red Star Belgrade, Manchester City, Feyenoord, Eintracht Frankfurt, Celtic, Feyenoord, Red Star Belgrade, Ajax, Benfica, Chelsea, Borussia Dortmund, Nottingham Forest, Steaua Bucharest, Hamburg",
   "timestamp": "2024-05-27T16:20:52.4563248+00:00",
-  "eTag": "W/\"datetime'2024-05-27T16%3A20%3A52.4563248Z'\""
+  "eTag": "W/\"datetime'2024-08-13T22%3A26%3A21.1198667Z'\""
 }
 
 ###
