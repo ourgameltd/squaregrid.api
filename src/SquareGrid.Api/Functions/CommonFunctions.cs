@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SquareGrid.Common.Exceptions;
 using SquareGrid.Common.Services.Tables.Models;
 using SquareGrid.Api.Utils;
+using SquareGrid.Common.Models;
 
 namespace SquareGrid.Api.Functions
 {
@@ -25,7 +26,7 @@ namespace SquareGrid.Api.Functions
         /// <param name="userId"></param>
         /// <returns></returns>
         /// <exception cref="SquareGridException"></exception>
-        protected async Task<SquareGridGame> GetGameByUserOrThrow(FunctionContext ctx, string gameId, string? userId = null)
+        protected async Task<Game> GetGameByUserOrThrow(FunctionContext ctx, string gameId, string? userId = null)
         {
             if (string.IsNullOrWhiteSpace(userId))
             {
@@ -33,14 +34,17 @@ namespace SquareGrid.Api.Functions
                 userId = user.ObjectId;
             }
 
-            var game = await tableManager.GetAsync<SquareGridGame>(userId, gameId);
+            var gameEntity = await tableManager.GetAsync<SquareGridGame>(userId, gameId);
 
-            if (game == null)
+            if (gameEntity == null)
             {
                 throw new SquareGridException("Game not found for user and game.");
             }
 
-            var blocks = await tableManager.GetAllAsync<SquareGridBlock>(game.RowKey);
+            var game = gameEntity.ToGame();
+
+            var blockEntities = await tableManager.GetAllAsync<SquareGridBlock>(gameEntity.RowKey);
+            var blocks = blockEntities.Select(b => b.ToBlock()).ToList();
             game.SetBlocks(blocks);
 
             return game;

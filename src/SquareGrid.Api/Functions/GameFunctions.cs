@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using SquareGrid.Api.Utils;
 using SquareGrid.Common.Exceptions;
+using SquareGrid.Common.Models;
 using SquareGrid.Common.Services.Tables.Models;
 using System.Net;
 
@@ -29,38 +30,38 @@ namespace SquareGrid.Api.Functions
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound)]
         [Function(nameof(LookupFriendlyName))]
         public async Task<HttpResponseData> LookupFriendlyName(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "games/{countryCode}/{friendlyName}/lookup")] HttpRequestData req, FunctionContext ctx,
-            string countryCode,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "games/{group}/{friendlyName}/lookup")] HttpRequestData req, FunctionContext ctx,
+            string group,
             string friendlyName)
         {
-            var lookup = await tableManager.GetAsync<SquareGridLookup>(countryCode, friendlyName);
+            var lookup = await tableManager.GetAsync<SquareGridLookup>(group, friendlyName);
 
             if (lookup == null) 
             {
-                return req.CreateResponse(HttpStatusCode.NotFound);
+                return req.CreateResponse(HttpStatusCode.NoContent);
             }
 
-            return req.CreateResponse(HttpStatusCode.NoContent);
+            return req.CreateResponse(HttpStatusCode.Conflict);
         }
 
         [OpenApiOperation(operationId: nameof(GetGameByFriendlyName), tags: ["game"], Summary = "Get a game by its country and friendly name.", Description = "Get a game by its country and friendly name.")]
         [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(SquareGridGame), Description = "The square grid game model.")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Game), Description = "The square grid game model.")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound)]
         [Function(nameof(GetGameByFriendlyName))]
         public async Task<HttpResponseData> GetGameByFriendlyName(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "games/{countryCode}/{friendlyName}")] HttpRequestData req, FunctionContext ctx,
-            string countryCode,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "games/{group}/{friendlyName}")] HttpRequestData req, FunctionContext ctx,
+            string group,
             string friendlyName)
         {
-            var lookup = await tableManager.GetAsync<SquareGridLookup>(countryCode, friendlyName);
+            var lookup = await tableManager.GetAsync<SquareGridLookup>(group, friendlyName);
 
             if (lookup == null)
             {
                 return req.CreateResponse(HttpStatusCode.NotFound);
             }
 
-            SquareGridGame game = await GetGameByUserOrThrow(ctx, lookup.GameId, lookup.UserId);
+            Game game = await GetGameByUserOrThrow(ctx, lookup.GameId, lookup.UserId);
 
             var okResponse = req.CreateResponse(HttpStatusCode.OK);
             await okResponse.WriteAsJsonAsync(game);
@@ -74,15 +75,21 @@ namespace SquareGrid.Api.Functions
         [Function(nameof(AddFriendlyName))]
         [Authorize]
         public async Task<HttpResponseData> AddFriendlyName(
-            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "games/{gameId}/{countryCode}/{friendlyName}")] HttpRequestData req, FunctionContext ctx,
+            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "games/{gameId}/{group}/{friendlyName}")] HttpRequestData req, FunctionContext ctx,
             string gameId,
-            string countryCode,
+            string group,
             string friendlyName)
         {
-            // Get the user and request body and validate it
+            var lookup = await tableManager.GetAsync<SquareGridLookup>(group, friendlyName);
+
+            if (lookup != null)
+            {
+                return req.CreateResponse(HttpStatusCode.Conflict);
+            }
+
             var user = ctx.GetUser();
 
-            SquareGridGame game;
+            Game game;
 
             try
             {
@@ -95,7 +102,7 @@ namespace SquareGrid.Api.Functions
 
             await tableManager.Insert(new SquareGridLookup()
             { 
-                PartitionKey = countryCode,
+                PartitionKey = group,
                 RowKey = friendlyName,
                 GameId = gameId,
                 UserId = user.ObjectId
@@ -105,19 +112,19 @@ namespace SquareGrid.Api.Functions
 
         [OpenApiOperation(operationId: nameof(GetGame), tags: ["game"], Summary = "Get a game by its user and id.", Description = "Get a game by its user and id.")]
         [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(SquareGridGame), Description = "The square grid game model.")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Game), Description = "The square grid game model.")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound)]
         [Function(nameof(GetGame))]
+        [Authorize]
         public async Task<HttpResponseData> GetGame(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "games/{userId}/{gameId}")] HttpRequestData req, FunctionContext ctx,
-            string userId,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "games/{gameId}")] HttpRequestData req, FunctionContext ctx,
             string gameId)
         {
-            SquareGridGame game;
+            Game game;
 
             try
             {
-                game = await GetGameByUserOrThrow(ctx, gameId, userId);
+                game = await GetGameByUserOrThrow(ctx, gameId);
             }
             catch (SquareGridException)
             {
@@ -131,24 +138,26 @@ namespace SquareGrid.Api.Functions
 
         [OpenApiOperation(operationId: nameof(GetGames), tags: ["game"], Summary = "Get all games for the logged in user.", Description = "Get all games for the logged in user.")]
         [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(SquareGridGame[]), Description = "An array of square grid game models.")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Game[]), Description = "An array of square grid game models.")]
         [Function(nameof(GetGames))]
         [Authorize]
         public async Task<HttpResponseData> GetGames(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "games")] HttpRequestData req, FunctionContext ctx)
         {
             var user = ctx.GetUser();
-            var games = await tableManager.GetAllAsync<SquareGridGame>(user.ObjectId);
+            var gameEntitites = await tableManager.GetAllAsync<SquareGridGame>(user.ObjectId);
+            var games = gameEntitites.Select(i => i.ToGame()).ToList();
 
             // This is a bit shit for now to get the blocks associated with each game, wont take long, but you get what I mean
             foreach (var game in games)
             {
-                var blocks = await tableManager.GetAllAsync<SquareGridBlock>(game.RowKey);
+                var blockEntities = await tableManager.GetAllAsync<SquareGridBlock>(game.RowKey);
+                var blocks = blockEntities.Select(i => i.ToBlock()).ToList();
                 game.SetBlocks(blocks);
             }
 
             var okResponse = req.CreateResponse(HttpStatusCode.OK);
-            await okResponse.WriteAsJsonAsync(games);
+            await okResponse.WriteAsJsonAsync(gameEntitites);
             return okResponse;
         }
 
@@ -171,7 +180,7 @@ namespace SquareGrid.Api.Functions
                 return data.HttpResponseData!;
             }
 
-            SquareGridGame game;
+            Game game;
 
             try
             {
@@ -213,7 +222,7 @@ namespace SquareGrid.Api.Functions
                 return data.HttpResponseData!;
             }
 
-            SquareGridGame game;
+            Game game;
 
             try
             {
@@ -226,7 +235,17 @@ namespace SquareGrid.Api.Functions
 
             data.Body!.RowKey = gameId;
 
-            await tableManager.Update(data.Body!);
+            try
+            {                 
+                await tableManager.Update(data.Body!);
+            }
+            catch (Exception e)
+            {
+                var response = req.CreateResponse(HttpStatusCode.InternalServerError);
+                response.WriteString(e.Message);
+                return response;
+            }
+
             return req.CreateResponse(HttpStatusCode.NoContent);
         }
 
@@ -250,7 +269,7 @@ namespace SquareGrid.Api.Functions
                 return data.HttpResponseData!;
             }
 
-            SquareGridGame game;
+            Game game;
 
             try
             {
@@ -283,9 +302,10 @@ namespace SquareGrid.Api.Functions
                return req.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            winningBlock.IsWinner = true;
+            SquareGridBlock? blockEntity = await tableManager.GetAsync<SquareGridBlock>(gameId, winningBlock.RowKey);
+            blockEntity!.IsWinner = true;
 
-            await tableManager.Update(winningBlock);
+            await tableManager.Update(blockEntity);
             return req.CreateResponse(HttpStatusCode.NoContent);
         }
     }

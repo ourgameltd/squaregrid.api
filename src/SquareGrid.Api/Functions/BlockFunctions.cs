@@ -12,6 +12,7 @@ using SquareGrid.Common.Exceptions;
 using SquareGrid.Common.Models;
 using SquareGrid.Common.Services.Tables.Models;
 using System.Net;
+using YamlDotNet.Core.Tokens;
 
 namespace SquareGrid.Api
 {
@@ -45,7 +46,7 @@ namespace SquareGrid.Api
                 return data.HttpResponseData!;
             }
 
-            SquareGridGame game;
+            Game game;
 
             try
             {
@@ -84,7 +85,7 @@ namespace SquareGrid.Api
         {
             var user = ctx.GetUser();
 
-            SquareGridGame game;
+            Game game;
 
             try
             {
@@ -120,27 +121,28 @@ namespace SquareGrid.Api
                 return data.HttpResponseData!;
             }
 
-            SquareGridBlock? block = await tableManager.GetAsync<SquareGridBlock>(gameId, blockId);
+            SquareGridBlock? blockEntity = await tableManager.GetAsync<SquareGridBlock>(gameId, blockId);
             
-            if (block == null)
+            if (blockEntity == null)
             {
                 return req.CreateResponse(HttpStatusCode.NotFound);
             }
 
+            var block = blockEntity.ToBlock();
             if (block.IsClaimed)
             {
                 return req.CreateResponse(HttpStatusCode.Conflict);
             }
 
-            block.ClaimedByFriendlyName = data.Body?.ClaimedBy;
-            block.DateClaimed = DateTime.UtcNow;
+            blockEntity.ClaimedByFriendlyName = data.Body?.ClaimedBy;
+            blockEntity.DateClaimed = DateTime.UtcNow;
 
             if (Guid.TryParse(user?.ObjectId, out Guid guid))
             {
-                block.ClaimedByUserId = guid;
+                blockEntity.ClaimedByUserId = guid;
             }
 
-            await tableManager.Update(block);
+            await tableManager.Update(blockEntity);
             return req.CreateResponse(HttpStatusCode.NoContent);
         }
 
@@ -158,21 +160,23 @@ namespace SquareGrid.Api
         {
             User? user = ctx.GetUserIfPopulated();
 
-            SquareGridBlock? block = await tableManager.GetAsync<SquareGridBlock>(gameId, blockId);
+            SquareGridBlock? blockEntity = await tableManager.GetAsync<SquareGridBlock>(gameId, blockId);
 
-            if (block == null)
+            if (blockEntity == null)
             {
                 return req.CreateResponse(HttpStatusCode.NotFound);
             }
+
+            var block = blockEntity.ToBlock();
 
             if (!block.IsClaimed)
             {
                 return req.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            block.DateConfirmed = DateTime.UtcNow;
+            blockEntity.DateConfirmed = DateTime.UtcNow;
 
-            await tableManager.Update(block);
+            await tableManager.Update(blockEntity);
             return req.CreateResponse(HttpStatusCode.NoContent);
         }
     }

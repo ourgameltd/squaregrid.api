@@ -22,9 +22,12 @@ namespace SquareGrid.Common
             tableGameClient.CreateIfNotExists();
             var tableBlockClient = tableServiceClient.GetTableClient(nameof(SquareGridBlock));
             tableBlockClient.CreateIfNotExists();
+            var tableLookupClient = tableServiceClient.GetTableClient(nameof(SquareGridLookup));
+            tableLookupClient.CreateIfNotExists();
             var tableClients = new Dictionary<string, TableClient>();
             tableClients.TryAdd(nameof(SquareGridGame), tableGameClient);
             tableClients.TryAdd(nameof(SquareGridBlock), tableBlockClient);
+            tableClients.TryAdd(nameof(SquareGridLookup), tableLookupClient);
             services.AddSingleton(new TableManager(tableClients));
             return services;
         }

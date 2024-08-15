@@ -1,11 +1,10 @@
 ﻿using Azure;
-using Azure.Data.Tables;
-using SquareGrid.Common.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
-namespace SquareGrid.Common.Services.Tables.Models
+namespace SquareGrid.Common.Models
 {
-    public class SquareGridBlock : ITableEntity, IBlock
+    public class Block : IBlock
     {
         /// <summary>
         /// PartitionKey is the RowKey of the SquareGridGame
@@ -47,9 +46,19 @@ namespace SquareGrid.Common.Services.Tables.Models
         public DateTime? DateClaimed { get; set; }
 
         /// <summary>
+        /// Is this claimed
+        /// </summary>
+        public bool IsClaimed => DateClaimed.HasValue;
+
+        /// <summary>
         /// Date the block was confirmed
         /// </summary>
         public DateTime? DateConfirmed { get; set; }
+
+        /// <summary>
+        /// Is this claimed
+        /// </summary>
+        public bool IsConfirmed => DateConfirmed.HasValue;
 
         /// <summary>
         /// Is winner
@@ -59,27 +68,5 @@ namespace SquareGrid.Common.Services.Tables.Models
         public DateTimeOffset? Timestamp { get; set; }
 
         public ETag ETag { get; set; }
-
-        /// <summary>
-        /// Convert to game model
-        /// </summary>
-        /// <returns></returns>
-        public Block ToBlock()
-        {
-            return new Block()
-            {
-                PartitionKey = PartitionKey,
-                ETag = ETag,
-                Timestamp = Timestamp,
-                ClaimedByFriendlyName = ClaimedByFriendlyName,
-                ClaimedByUserId = ClaimedByUserId,
-                DateClaimed = DateClaimed,
-                DateConfirmed = DateConfirmed,
-                Index = Index,
-                IsWinner = IsWinner,
-                RowKey = RowKey,
-                Title = Title
-            };
-        }
     }
 }
