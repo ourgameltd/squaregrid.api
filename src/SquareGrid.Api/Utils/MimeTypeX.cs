@@ -26,6 +26,7 @@ namespace SquareGrid.Api.Utils
 
         private static readonly Dictionary<string, string> MimeTypes = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
         {
+            { "application/octet-stream", "" },
             { "image/jpeg", ".jpg" },
             { "image/png", ".png" },
             { "image/gif", ".gif" },

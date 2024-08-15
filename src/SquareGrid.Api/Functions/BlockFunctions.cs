@@ -12,7 +12,6 @@ using SquareGrid.Common.Exceptions;
 using SquareGrid.Common.Models;
 using SquareGrid.Common.Services.Tables.Models;
 using System.Net;
-using YamlDotNet.Core.Tokens;
 
 namespace SquareGrid.Api
 {
@@ -114,7 +113,7 @@ namespace SquareGrid.Api
         {
 
             User? user = ctx.GetUserIfPopulated();
-            var data = await req.GetFromBodyValidated<PutBlockRequest>();
+            var data = await req.GetFromBodyValidated<ClaimBlockRequest>();
 
             if (!data.IsValid)
             {
@@ -174,7 +173,7 @@ namespace SquareGrid.Api
                 return req.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            blockEntity.DateConfirmed = DateTime.UtcNow;
+            blockEntity.DateConfirmed = blockEntity.DateConfirmed.HasValue ? null : DateTime.UtcNow;
 
             await tableManager.Update(blockEntity);
             return req.CreateResponse(HttpStatusCode.NoContent);

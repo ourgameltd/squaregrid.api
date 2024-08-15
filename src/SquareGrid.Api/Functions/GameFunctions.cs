@@ -262,12 +262,6 @@ namespace SquareGrid.Api.Functions
             string gameId)
         {
             var user = ctx.GetUser();
-            var data = await req.GetFromBodyValidated<SquareGridGame>();
-
-            if (!data.IsValid)
-            {
-                return data.HttpResponseData!;
-            }
 
             Game game;
 

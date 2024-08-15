@@ -19,7 +19,7 @@ public class TableManager
     public async Task Update<T>(T entity) where T : class, ITableEntity
     {
         var tableClient = tableClientDictionary[typeof(T).Name];
-        await tableClient.UpdateEntityAsync(entity, entity.ETag, mode: TableUpdateMode.Merge);
+        await tableClient.UpdateEntityAsync(entity, entity.ETag, mode: TableUpdateMode.Replace);
     }
 
     public async Task DeleteAsync<T>(string partitionKey, string rowKey) where T : class, ITableEntity
