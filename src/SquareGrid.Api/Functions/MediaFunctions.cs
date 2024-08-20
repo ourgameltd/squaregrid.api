@@ -6,31 +6,47 @@ using SquareGrid.Common.Services.Tables.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Net;
 using HttpMultipartParser;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
+using Microsoft.OpenApi.Models;
+using SquareGrid.Api.Functions.Models.Response;
 
 namespace SquareGrid.Api.Functions
 {
-    public class MediaFunctions
+    public class MediaFunctions : CommonFunctions
     {
         private readonly TableManager tableManager;
         private readonly MediaBlobManager mediaManager;
         private readonly ILogger<MediaFunctions> logger;
 
-        public MediaFunctions(TableManager tableManager, MediaBlobManager mediaManager, ILogger<MediaFunctions> logger)
+        public MediaFunctions(TableManager tableManager, MediaBlobManager mediaManager, ILogger<MediaFunctions> logger) : base(tableManager, mediaManager, logger)
         {
             this.tableManager = tableManager;
             this.mediaManager = mediaManager;
             this.logger = logger;
         }
 
+        [OpenApiOperation(operationId: nameof(UploadProfileImage), tags: ["media"], Summary = "Upload a profile image for a logged in user.", Description = "Upload a profile image for a logged in user.")]
+        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.Created, contentType: "application/json", bodyType: typeof(UploadImageResponse), Description = "Response detailing the saved image location.")]
+        [OpenApiRequestBody("multipart/form-data", typeof(FilePart), Required = true, Description = "The image file to upload")]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest)]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [Function(nameof(UploadProfileImage))]
         [Authorize]
         public async Task<HttpResponseData> UploadProfileImage(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "images/user")] HttpRequestData req, FunctionContext ctx)
         {
             var user = ctx.GetUser();
-            return await UploadImage($"images/user/{user.ObjectId}", req, ctx);
+            return await UploadImage($"images/users/{user.ObjectId}", req, ctx);
         }
 
+        [OpenApiOperation(operationId: nameof(UploadGameImage), tags: ["media"], Summary = "Upload a game image for a logged in user.", Description = "Upload a game image for a logged in user.")]
+        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.Created, contentType: "application/json", bodyType: typeof(UploadImageResponse), Description = "Response detailing the saved image location.")]
+        [OpenApiRequestBody("multipart/form-data", typeof(FilePart), Required = true, Description = "The image file to upload")]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest)]
+        [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [Function(nameof(UploadGameImage))]
         [Authorize]
         public async Task<HttpResponseData> UploadGameImage(
@@ -48,33 +64,6 @@ namespace SquareGrid.Api.Functions
             }
 
             return await UploadImage($"images/games/{gameId}", req, ctx);
-        }
-
-        private async Task<HttpResponseData> UploadImage(string path, HttpRequestData req, FunctionContext ctx)
-        {
-            var response = req.CreateResponse();
-
-            var parser = await MultipartFormDataParser.ParseAsync(req.Body);
-
-            if (parser.Files.Count == 0)
-            {
-                response.StatusCode = HttpStatusCode.BadRequest;
-                await response.WriteStringAsync("No file uploaded.");
-                return response;
-            }
-
-            var file = parser.Files[0];
-
-            // Validate the upload type
-            _ = MimeTypeX.GetExtension(file.ContentType);
-
-            using (var fileStream = file.Data)
-            {
-                await mediaManager.Upload($"/{path}", fileStream);
-                response.StatusCode = HttpStatusCode.Created;
-            }
-
-            return response;
         }
     }
 }

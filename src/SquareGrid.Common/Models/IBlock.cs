@@ -12,8 +12,6 @@ namespace SquareGrid.Common.Models
 
         DateTime? DateConfirmed { get; set; }
 
-        ETag ETag { get; set; }
-
         int Index { get; set; }
 
         bool IsWinner { get; set; }

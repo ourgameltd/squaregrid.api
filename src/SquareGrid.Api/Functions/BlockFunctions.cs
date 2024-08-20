@@ -20,7 +20,7 @@ namespace SquareGrid.Api
         private readonly TableManager tableManager;
         private readonly ILogger<GameFunctions> logger;
 
-        public BlockFunctions(TableManager tableManager, ILogger<GameFunctions> logger) : base(tableManager, logger)
+        public BlockFunctions(TableManager tableManager, MediaBlobManager mediaManager, ILogger<GameFunctions> logger) : base(tableManager, mediaManager, logger)
         {
             this.tableManager = tableManager;
             this.logger = logger;

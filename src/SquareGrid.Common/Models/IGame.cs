@@ -6,9 +6,11 @@ namespace SquareGrid.Common.Models
     {
         string Description { get; set; }
 
-        ETag ETag { get; set; }
-
         string? Image { get; set; }
+
+        string? GroupName { get; set; }
+
+        string? ShortName { get; set; }
 
         string PartitionKey { get; set; }
 
@@ -17,5 +19,7 @@ namespace SquareGrid.Common.Models
         DateTimeOffset? Timestamp { get; set; }
 
         string Title { get; set; }
+
+        bool DisplayAsGrid { get; set; }
     }
 }

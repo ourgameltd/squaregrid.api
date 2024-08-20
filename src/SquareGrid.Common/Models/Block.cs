@@ -1,4 +1,5 @@
 ﻿using Azure;
+using SquareGrid.Common.Services.Tables.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
@@ -67,6 +68,24 @@ namespace SquareGrid.Common.Models
 
         public DateTimeOffset? Timestamp { get; set; }
 
-        public ETag ETag { get; set; }
+        public string? ETag { get; set; }
+
+        public SquareGridBlock ToBlock()
+        {
+            return new SquareGridBlock()
+            {
+                PartitionKey = PartitionKey,
+                RowKey = RowKey,
+                Title = Title,
+                Index = Index,
+                ClaimedByUserId = ClaimedByUserId,
+                ClaimedByFriendlyName = ClaimedByFriendlyName,
+                DateClaimed = DateClaimed,
+                DateConfirmed = DateConfirmed,
+                IsWinner = IsWinner,
+                Timestamp = Timestamp,
+                ETag = string.IsNullOrWhiteSpace(ETag) ? new ETag() : new ETag(ETag) 
+            };
+        }
     }
 }

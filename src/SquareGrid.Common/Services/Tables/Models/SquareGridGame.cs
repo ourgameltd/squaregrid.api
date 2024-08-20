@@ -2,7 +2,6 @@
 using Azure.Data.Tables;
 using SquareGrid.Common.Models;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
 
 namespace SquareGrid.Common.Services.Tables.Models
 {
@@ -32,6 +31,16 @@ namespace SquareGrid.Common.Services.Tables.Models
         public string? Image { get; set; }
 
         /// <summary>
+        /// The group name for the card
+        /// </summary>
+        public string? GroupName { get; set; }
+
+        /// <summary>
+        /// The shortname for the card
+        /// </summary>
+        public string? ShortName { get; set; }
+
+        /// <summary>
         /// A description for the game
         /// </summary>
         [Required]
@@ -42,6 +51,11 @@ namespace SquareGrid.Common.Services.Tables.Models
         public ETag ETag { get; set; }
 
         /// <summary>
+        /// Display on UI as a grid
+        /// </summary>
+        public bool DisplayAsGrid { get; set; }
+
+        /// <summary>
         /// Convert to game model
         /// </summary>
         /// <returns></returns>
@@ -49,13 +63,16 @@ namespace SquareGrid.Common.Services.Tables.Models
         {
             return new Game()
             {
-                ETag = ETag,
+                ETag = ETag.ToString(),
                 Timestamp = Timestamp,
                 PartitionKey = PartitionKey,
                 RowKey = RowKey,
                 Title = Title,
                 Image = Image,
-                Description = Description
+                GroupName = GroupName,
+                ShortName = ShortName,
+                Description = Description,
+                DisplayAsGrid = DisplayAsGrid
             };
         }
     }

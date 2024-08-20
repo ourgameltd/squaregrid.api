@@ -16,10 +16,10 @@ public class TableManager
         await tableClient.AddEntityAsync(entity);
     }
 
-    public async Task Update<T>(T entity) where T : class, ITableEntity
+    public async Task Update<T>(T entity, TableUpdateMode mode = TableUpdateMode.Replace) where T : class, ITableEntity
     {
         var tableClient = tableClientDictionary[typeof(T).Name];
-        await tableClient.UpdateEntityAsync(entity, entity.ETag, mode: TableUpdateMode.Replace);
+        await tableClient.UpdateEntityAsync(entity, entity.ETag, mode: mode);
     }
 
     public async Task DeleteAsync<T>(string partitionKey, string rowKey) where T : class, ITableEntity

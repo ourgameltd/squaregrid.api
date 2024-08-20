@@ -1,3 +1,5 @@
+using Azure;
+using HttpMultipartParser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -9,6 +11,7 @@ using SquareGrid.Api.Utils;
 using SquareGrid.Common.Exceptions;
 using SquareGrid.Common.Models;
 using SquareGrid.Common.Services.Tables.Models;
+using SquareGrid.Common.Utils;
 using System.Net;
 
 namespace SquareGrid.Api.Functions
@@ -18,7 +21,7 @@ namespace SquareGrid.Api.Functions
         private readonly TableManager tableManager;
         private readonly ILogger<GameFunctions> logger;
 
-        public GameFunctions(TableManager tableManager, ILogger<GameFunctions> logger) : base(tableManager, logger)
+        public GameFunctions(TableManager tableManager, MediaBlobManager mediaManager, ILogger<GameFunctions> logger) : base(tableManager, mediaManager, logger)
         {
             this.tableManager = tableManager;
             this.logger = logger;
@@ -71,7 +74,7 @@ namespace SquareGrid.Api.Functions
             }
 
             var okResponse = req.CreateResponse(HttpStatusCode.OK);
-            await okResponse.WriteAsJsonAsync(gameEntitites);
+            await okResponse.WriteAsJsonAsync(games);
             return okResponse;
         }
 
@@ -119,7 +122,7 @@ namespace SquareGrid.Api.Functions
 
         [OpenApiOperation(operationId: nameof(PostGame), tags: ["game"], Summary = "Updates a game for a user.", Description = "Updates a game for a user.")]
         [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
-        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(SquareGridGame), Description = "A square grid game model.")]
+        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Game), Description = "A square grid game model.")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
         [Function(nameof(PostGame))]
@@ -129,29 +132,98 @@ namespace SquareGrid.Api.Functions
             string gameId)
         {
             var user = ctx.GetUser();
-            var data = await req.GetFromBodyValidated<SquareGridGame>();
+
+            var parser = await MultipartFormDataParser.ParseAsync(req.Body);
+            var image = await UploadImageIfPopulated($"images/games/{gameId}", req, ctx, parser);
+            var data = await req.GetFromStringValidated<Game>(parser);
 
             if (!data.IsValid)
             {
                 return data.HttpResponseData!;
             }
 
-            Game game;
+            var gameEntity = await tableManager.GetAsync<SquareGridGame>(user.ObjectId, gameId);
 
-            try
-            {
-                game = await GetGameByUserOrThrow(ctx, gameId);
-            }
-            catch (SquareGridException)
+            if (gameEntity == null)
             {
                 return req.CreateResponse(HttpStatusCode.Forbidden);
             }
 
-            data.Body!.RowKey = gameId;
+            gameEntity.RowKey = gameId;
+            gameEntity.Title = data.Body!.Title;
+            gameEntity.Description = data.Body!.Description;
+            gameEntity.GroupName = data.Body!.GroupName.GenerateSlug();
+            gameEntity.ShortName = data.Body!.ShortName.GenerateSlug();
+            gameEntity.DisplayAsGrid = data.Body!.DisplayAsGrid;    
+
+            if (!string.IsNullOrWhiteSpace(image))
+            {
+               gameEntity.Image = image;
+            }
+
+            if (!string.IsNullOrWhiteSpace(gameEntity.GroupName) && !string.IsNullOrWhiteSpace(gameEntity.ShortName))
+            {
+                var lookup = await tableManager.GetAsync<SquareGridLookup>(gameEntity.GroupName, gameEntity.ShortName);
+
+                if (lookup == null)
+                {
+                    await tableManager.Insert(new SquareGridLookup()
+                    {
+                        GameId = gameId,
+                        UserId = user.ObjectId,
+                        PartitionKey = gameEntity.GroupName,
+                        RowKey = gameEntity.ShortName
+                    });
+                }
+                else
+                {
+                    if (lookup.UserId != user.ObjectId)
+                    {
+                        return req.CreateResponse(HttpStatusCode.Forbidden);
+                    }
+
+                    lookup.GameId = gameId;
+
+                    await tableManager.Update(lookup, Azure.Data.Tables.TableUpdateMode.Merge);
+                }
+            }
+
+            var gameBlocks = await tableManager.GetAllAsync<SquareGridBlock>(gameId);
+
+            if (gameBlocks.Any(i => i.PartitionKey != gameId))
+            {
+                return req.CreateResponse(HttpStatusCode.Forbidden);
+            }
+
+            var blocksDeleted = gameBlocks.Where(i => data.Body.Blocks.All(b => b.RowKey != i.RowKey)).ToList();
+            var blocksMatched = gameBlocks.Where(i => data.Body.Blocks.Any(b => b.RowKey == i.RowKey)).ToList();
+            var blocksAdded = data.Body.Blocks.Where(i => gameBlocks.All(b => b.RowKey != i.RowKey)).ToList();
 
             try
-            {                 
-                await tableManager.Update(data.Body!);
+            {
+                foreach (var block in blocksDeleted)
+                {
+                    await tableManager.DeleteAsync<SquareGridBlock>(block.PartitionKey, block.RowKey);
+                }
+
+                foreach (var block in blocksMatched)
+                {
+                    var blockData = data.Body.Blocks.First(i => i.RowKey == block.RowKey);
+                    block.ClaimedByFriendlyName = blockData.ClaimedByFriendlyName;
+                    block.ClaimedByUserId = blockData.ClaimedByUserId;
+                    block.DateClaimed = blockData.DateClaimed;
+                    block.DateConfirmed = blockData.DateConfirmed;
+                    block.Title = blockData.Title;
+                    await tableManager.Update(block);
+                }
+
+                foreach (var block in blocksAdded)
+                {
+                    var newBlock = block.ToBlock();
+                    await tableManager.Insert(newBlock);
+                }       
+                
+                await tableManager.Update(gameEntity);
             }
             catch (Exception e)
             {

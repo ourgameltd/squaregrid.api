@@ -18,7 +18,7 @@ namespace SquareGrid.Api.Functions
         private readonly TableManager tableManager;
         private readonly ILogger<GameFunctions> logger;
 
-        public LookupFunctions(TableManager tableManager, ILogger<GameFunctions> logger) : base(tableManager, logger)
+        public LookupFunctions(TableManager tableManager, MediaBlobManager mediaManager, ILogger<GameFunctions> logger) : base(tableManager, mediaManager, logger)
         {
             this.tableManager = tableManager;
             this.logger = logger;

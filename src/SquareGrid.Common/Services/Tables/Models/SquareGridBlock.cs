@@ -69,7 +69,7 @@ namespace SquareGrid.Common.Services.Tables.Models
             return new Block()
             {
                 PartitionKey = PartitionKey,
-                ETag = ETag,
+                ETag = ETag.ToString(),
                 Timestamp = Timestamp,
                 ClaimedByFriendlyName = ClaimedByFriendlyName,
                 ClaimedByUserId = ClaimedByUserId,

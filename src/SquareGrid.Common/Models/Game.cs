@@ -29,6 +29,16 @@ namespace SquareGrid.Common.Models
         public string? Image { get; set; }
 
         /// <summary>
+        /// The group name for the card
+        /// </summary>
+        public string? GroupName { get; set; }
+
+        /// <summary>
+        /// The shortname for the card
+        /// </summary>
+        public string? ShortName { get; set; }
+
+        /// <summary>
         /// A description for the game
         /// </summary>
         [Required]
@@ -40,19 +50,46 @@ namespace SquareGrid.Common.Models
         public List<Block> Blocks { get; private set; } = new List<Block>();
 
         /// <summary>
+        /// The amount of blocks
+        /// </summary>
+        public int BlockCount => Blocks.Count();
+
+        /// <summary>
         /// Are are blocks now claimed
         /// </summary>
-        public bool IsClaimed => Blocks.All(b => b.IsClaimed);
+        public bool IsClaimed => Blocks.Count() == 0 ? false : Blocks.All(b => b.IsClaimed);
+
+        /// <summary>
+        /// The amount of blocks
+        /// </summary>
+        public int ClaimedBlockCount => Blocks.Count() == 0 ? 0 : Blocks.Where(i => i.IsClaimed).Count();
+
+        /// <summary>
+        /// The amount of blocks
+        /// </summary>
+        public int PercentageClaimed
+        {
+            get
+            {
+                if (ClaimedBlockCount == 0 || BlockCount == 0)
+                {
+                    return 0;
+                }
+
+                int percentage = (int)Math.Round(((double)ClaimedBlockCount / BlockCount) * 100, 1);
+                return Math.Min(percentage, 100);
+            }
+        }
 
         /// <summary>
         /// Are all blocks claimed and confirmed
         /// </summary>
-        public bool IsCompleted => IsClaimed && Blocks.All(b => b.IsConfirmed);
+        public bool IsCompleted => Blocks.Count() == 0 ? false : IsClaimed && Blocks.All(b => b.IsConfirmed);
 
         /// <summary>
         /// Is this game won
         /// </summary>
-        public bool IsWon => Blocks.Any(b => b.IsWinner);
+        public bool IsWon => Blocks.Count() == 0 ? false : Blocks.Any(b => b.IsWinner);
 
         /// <summary>
         /// Won by user id
@@ -123,6 +160,11 @@ namespace SquareGrid.Common.Models
 
         public DateTimeOffset? Timestamp { get; set; }
 
-        public ETag ETag { get; set; }
+        public string? ETag { get; set; }
+
+        /// <summary>
+        /// Display on UI as a grid
+        /// </summary>
+        public bool DisplayAsGrid { get; set; }
     }
 }
