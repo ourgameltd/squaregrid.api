@@ -145,7 +145,7 @@ namespace SquareGrid.Common.Models
         /// <returns></returns>
         public Block? PickAWinner()
         {
-            var confirmedBlocks = Blocks.Where(o => o.IsConfirmed).ToList();
+            var confirmedBlocks = Blocks.Where(o => o.IsClaimed).ToList();
 
             if (confirmedBlocks.Count == 0)
             {
