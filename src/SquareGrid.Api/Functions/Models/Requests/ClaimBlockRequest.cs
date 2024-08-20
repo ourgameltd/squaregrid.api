@@ -2,7 +2,7 @@
 
 namespace SquareGrid.Api.Functions.Models.Requests
 {
-    internal class ClaimBlockRequest
+    public class ClaimBlockRequest
     {
         [Required]
         public required string? ClaimedBy { get; set; }

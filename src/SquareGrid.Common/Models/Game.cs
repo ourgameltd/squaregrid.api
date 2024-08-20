@@ -155,7 +155,14 @@ namespace SquareGrid.Common.Models
             Random random = new Random();
 
             int randomIndex = random.Next(confirmedBlocks.Count);
-            return confirmedBlocks[randomIndex];
+            var block = confirmedBlocks[randomIndex];
+
+            foreach (var b in Blocks)
+            {
+                b.IsWinner = b.Index == block.Index;
+            }
+
+            return block;
         }
 
         public DateTimeOffset? Timestamp { get; set; }

@@ -286,7 +286,9 @@ namespace SquareGrid.Api.Functions
             blockEntity!.IsWinner = true;
 
             await tableManager.Update(blockEntity);
-            return req.CreateResponse(HttpStatusCode.NoContent);
+            var response = req.CreateResponse(HttpStatusCode.OK);
+            await response.WriteAsJsonAsync(game);
+            return response;
         }
     }
 }

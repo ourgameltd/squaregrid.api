@@ -67,7 +67,6 @@ namespace SquareGrid.Api.Utils
 
         public static async Task<Validated<T>> GetFromBodyValidated<T>(this HttpRequestData req) where T : class
         {
-            var body = await req.ReadAsStringAsync();
             T? data = await req.ReadFromJsonAsync<T>();
 
             if (data == null)
