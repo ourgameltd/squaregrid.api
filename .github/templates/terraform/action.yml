@@ -73,5 +73,5 @@ runs:
     working-directory: build/infra
     if: inputs.apply_changes == 'true'
     run: |
-      echo $(terraform output -raw function_app_name)
-      echo "FUNCTION_APP_NAME=$(terraform output -raw function_app_name)" >> $GITHUB_ENV
+      export FUNCTION_APP_NAME=$(terraform output -raw function_app_name)
+      echo "FUNCTION_APP_NAME=$FUNCTION_APP_NAME" >> $GITHUB_ENV
