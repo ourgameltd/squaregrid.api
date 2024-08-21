@@ -10,7 +10,7 @@ on:
 
 jobs:
   terraform:
-    uses: ./.github/workflow-templates/terraform.yml
+    uses: ./.github/workflows/terraform.yml
     with:
       environment: Dev
       b2c_authority: ${{ env.B2C_AUTHORITY }}
@@ -20,6 +20,6 @@ jobs:
 
   build:
     needs: terraform
-    uses: ./.github/workflow-templates/build.yml
+    uses: ./.github/workflows/build.yml
     with:
       environment: Dev

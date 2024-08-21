@@ -5,7 +5,7 @@ on:
 
 jobs:
   terraform:
-    uses: ./.github/workflow-templates/terraform.yml
+    uses: ./.github/workflows/terraform.yml
     with:
       environment: Dev
       b2c_authority: ${{ env.B2C_AUTHORITY }}
@@ -15,13 +15,13 @@ jobs:
 
   build:
     needs: terraform
-    uses: ./.github/workflow-templates/build.yml
+    uses: ./.github/workflows/build.yml
     with:
       environment: Dev
 
   release:
     needs: [build]
-    uses: ./.github/workflow-templates/deploy.yml
+    uses: ./.github/workflows/deploy.yml
     with:
       environment: Dev
       function_app_name: ${{ needs.terraform.outputs.function_app_name }}

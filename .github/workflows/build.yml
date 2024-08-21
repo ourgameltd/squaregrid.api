@@ -1,4 +1,4 @@
-name: Build .NET Project
+name: Template - Build .NET Project
 
 on:
   workflow_call:

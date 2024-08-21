@@ -1,4 +1,4 @@
-name: Release to Azure Function App
+name: Template - Release to Azure Function App
 
 on:
   workflow_call:
