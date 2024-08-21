@@ -25,17 +25,16 @@ runs:
   - name: 'Generate tfvars file'
     shell: bash
     working-directory: build/infra
+    env:
+      environment: ${{ inputs.environment }}
+      b2c_authority: ${{ inputs.b2c_authority }}
+      b2c_issuer: ${{ inputs.b2c_issuer }}
+      b2c_client_id: ${{ inputs.b2c_client_id }}
     run: |
-      echo 'environment = "${{ inputs.environment }}"' > terraform.tfvars
-      echo 'b2c_authority = "${{ inputs.b2c_authority }}"' >> terraform.tfvars
-      echo 'b2c_issuer = "${{ inputs.b2c_issuer }}"' >> terraform.tfvars
-      echo 'b2c_client_id = "${{ inputs.b2c_client_id }}"' >> terraform.tfvars
-
-  - name: 'TF Config'
-    shell: bash
-    working-directory: build/infra
-    run: |
-      cat terraform.tfvars
+      echo 'environment = "$environment"' > terraform.tfvars
+      echo 'b2c_authority = "$b2c_authority"' >> terraform.tfvars
+      echo 'b2c_issuer = "$b2c_issuer"' >> terraform.tfvars
+      echo 'b2c_client_id = "$b2c_client_id"' >> terraform.tfvars
 
   - name: 'Terraform Init'
     shell: bash
