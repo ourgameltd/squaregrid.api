@@ -1,4 +1,4 @@
-name: Release to dev
+name: PR
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   terraform:
-    uses: ./.github/workflows/terraform.yml
+    uses: ./.github/workflow-templates/terraform.yml
     with:
       environment: Dev
       b2c_authority: ${{ env.B2C_AUTHORITY }}
@@ -20,6 +20,6 @@ jobs:
 
   build:
     needs: terraform
-    uses: ./.github/workflows/build.yml
+    uses: ./.github/workflow-templates/build.yml
     with:
       environment: Dev
