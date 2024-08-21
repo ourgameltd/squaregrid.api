@@ -19,9 +19,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - name: 'Checkout code'
-    uses: actions/checkout@v3
-
   - name: 'Set up Terraform'
     uses: hashicorp/setup-terraform@v2
     with:
@@ -40,24 +37,15 @@ runs:
       echo 'b2c_client_id = "${{ inputs.b2c_client_id }}"' >> terraform.tfvars
 
   - name: 'Terraform Init'
+    shell: bash
     run: terraform init
 
   - name: 'Terraform Plan'
+    shell: bash
     id: tfplan
     run: terraform plan -var-file=terraform.tfvars -out=tfplan
 
   - name: 'Terraform Apply'
+    shell: bash
     if: inputs.apply_changes == 'true'
     run: terraform apply -auto-approve tfplan
-
-  - name: 'Extract Outputs'
-    id: outputs
-    run: |
-      terraform output -json > outputs.json
-    if: inputs.apply_changes == 'true' || steps.tfplan.outcome == 'success'
-
-  - name: 'Set Outputs'
-    id: set_outputs
-    if: inputs.apply_changes == 'true' || steps.tfplan.outcome == 'success'
-    run: |
-      echo "::set-output name=function_app_name::$(jq -r '.function_app_name.value' outputs.json)"

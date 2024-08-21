@@ -27,5 +27,5 @@ jobs:
       - uses: ./.github/templates/deploy
         with:
           azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-          function_app_name: ${{ needs.terraform.outputs.function_app_name }}
-          package_path: ${{ needs.build.outputs.package_path }}
+          function_app_name: ${{ env.TERRAFORM_FUNCTION_APP_NAME }}
+          package_path: ./publish/functionapp.zip

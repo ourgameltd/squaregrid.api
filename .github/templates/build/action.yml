@@ -4,9 +4,6 @@ description: Template - Build
 runs:
   using: "composite"
   steps:
-  - name: 'Checkout code'
-    uses: actions/checkout@v3
-
   - name: 'Set up .NET'
     uses: actions/setup-dotnet@v3
     with:
