@@ -21,14 +21,14 @@ jobs:
       - uses: ./.github/templates/terraform
         with:
           environment: Dev
-          b2c_authority: ${{ env.B2C_AUTHORITY }}
-          b2c_issuer: ${{ env.B2C_ISSUER }}
-          b2c_client_id: ${{ env.B2C_CLIENT_ID }}
+          b2c_authority: ${{ vars.B2C_AUTHORITY }}
+          b2c_issuer: ${{ vars.B2C_ISSUER }}
+          b2c_client_id: ${{ vars.B2C_CLIENT_ID }}
           apply_changes: true
 
       - uses: ./.github/templates/build
 
       - uses: ./.github/templates/deploy
         with:
-          function_app_name: ${{ env.TERRAFORM_FUNCTION_APP_NAME }}
+          function_app_name: ${{ vars.TERRAFORM_FUNCTION_APP_NAME }}
           package_path: ./publish/functionapp.zip

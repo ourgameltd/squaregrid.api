@@ -26,9 +26,9 @@ jobs:
       - uses: ./.github/templates/terraform
         with:
           environment: Dev
-          b2c_authority: ${{ env.B2C_AUTHORITY }}
-          b2c_issuer: ${{ env.B2C_ISSUER }}
-          b2c_client_id: ${{ env.B2C_CLIENT_ID }}
+          b2c_authority: ${{ vars.B2C_AUTHORITY }}
+          b2c_issuer: ${{ vars.B2C_ISSUER }}
+          b2c_client_id: ${{ vars.B2C_CLIENT_ID }}
           apply_changes: false
 
       - uses: ./.github/templates/build

@@ -31,11 +31,6 @@ runs:
       B2C_ISSUER: ${{ inputs.b2c_issuer }}
       B2C_CLIENT_ID: ${{ inputs.b2c_client_id }}
     run: |
-      echo "ENV=$ENV" >> $GITHUB_ENV
-      echo "B2C_AUTHORITY=$B2C_AUTHORITY" >> $GITHUB_ENV
-      echo "B2C_ISSUER=$B2C_ISSUER" >> $GITHUB_ENV
-      echo "B2C_CLIENT_ID=$B2C_CLIENT_ID" >> $GITHUB_ENV
-
       echo "environment=$ENV" > terraform.tfvars
       echo "b2c_authority=$B2C_AUTHORITY" >> terraform.tfvars
       echo "b2c_issuer=$B2C_ISSUER" >> terraform.tfvars
@@ -67,3 +62,9 @@ runs:
     working-directory: build/infra
     if: inputs.apply_changes == 'true'
     run: terraform apply -auto-approve tfplan
+
+  - name: Create env vars
+    shell: bash
+    run: |
+      echo "TERRAFORM_FUNCTION_APP_NAME=$(terraform output -raw function_app_name)" >> $GITHUB_ENV
+    working-directory: build/infra
