@@ -13,10 +13,14 @@ jobs:
         with:
           submodules: true
 
+      - uses: ./.github/templates/setup
+        with:
+          environment: Dev
+          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+
       - uses: ./.github/templates/terraform
         with:
           environment: Live
-          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
           b2c_authority: ${{ env.B2C_AUTHORITY }}
           b2c_issuer: ${{ env.B2C_ISSUER }}
           b2c_client_id: ${{ env.B2C_CLIENT_ID }}
@@ -26,6 +30,5 @@ jobs:
 
       - uses: ./.github/templates/deploy
         with:
-          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
           function_app_name: ${{ env.TERRAFORM_FUNCTION_APP_NAME }}
           package_path: ./publish/functionapp.zip

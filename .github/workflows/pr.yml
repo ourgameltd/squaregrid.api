@@ -18,10 +18,14 @@ jobs:
         with:
           submodules: true
 
-      - uses: ./.github/templates/terraform
+      - uses: ./.github/templates/setup
         with:
           environment: Dev
           azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - uses: ./.github/templates/terraform
+        with:
+          environment: Dev
           b2c_authority: ${{ env.B2C_AUTHORITY }}
           b2c_issuer: ${{ env.B2C_ISSUER }}
           b2c_client_id: ${{ env.B2C_CLIENT_ID }}

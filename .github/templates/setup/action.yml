@@ -1,0 +1,33 @@
+name: Setup
+description: Configure environment variables for terraform and azure
+
+inputs:
+  azure_credentials:
+    description: Azure creds for Azure CLI
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    # Setup
+    
+    - uses: Azure/login@v1
+      with:
+        creds: ${{ inputs.azure_credentials }}
+
+    - name: Convert Azure credentials to env vars
+      env:
+        AZURE_CREDENTIALS: ${{ inputs.azure_credentials }}
+      run: | 
+        $servicePrincipal = ($env:AZURE_CREDENTIALS | ConvertFrom-Json)
+        $env:ARM_CLIENT_ID = $servicePrincipal.clientId
+        $env:ARM_CLIENT_SECRET = $servicePrincipal.clientSecret
+        $env:ARM_SUBSCRIPTION_ID = $servicePrincipal.subscriptionId
+        $env:ARM_TENANT_ID = $servicePrincipal.tenantId
+        $env:AZURE_CLIENT_ID = $servicePrincipal.clientId
+        $env:AZURE_CLIENT_SECRET = $servicePrincipal.clientSecret
+        $env:AZURE_SUBSCRIPTION_ID = $servicePrincipal.subscriptionId
+        $env:AZURE_TENANT_ID = $servicePrincipal.tenantId
+        Get-ChildItem -Path Env: -Recurse -Include ARM_*,AZURE_* | ForEach-Object {Write-Output "$($_.Name)=$($_.Value)"} >> $env:GITHUB_ENV
+      shell: pwsh
+    
