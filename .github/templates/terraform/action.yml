@@ -65,6 +65,6 @@ runs:
 
   - name: Create env vars
     shell: bash
-    run: |
-      echo "TERRAFORM_FUNCTION_APP_NAME=$(terraform output -raw function_app_name)" >> $GITHUB_ENV
     working-directory: build/infra
+    run: |
+      echo "TERRAFORM_FUNCTION_APP_NAME=\"$(terraform output -raw function_app_name)\"" >> $GITHUB_ENV
