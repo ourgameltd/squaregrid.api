@@ -31,6 +31,7 @@ runs:
 
   - name: 'Generate tfvars file'
     shell: bash
+    working-directory: build/infra
     run: |
       echo 'environment = "${{ inputs.environment }}"' > terraform.tfvars
       echo 'b2c_authority = "${{ inputs.b2c_authority }}"' >> terraform.tfvars
@@ -39,14 +40,17 @@ runs:
 
   - name: 'Terraform Init'
     shell: bash
-    run: terraform init
+    working-directory: build/infra
+    run: terraform init -backend-config=storage_account_name="terraformogdvtst" -backend-config=container_name="state-dev" -reconfigure
 
   - name: 'Terraform Plan'
     shell: bash
+    working-directory: build/infra
     id: tfplan
     run: terraform plan -var-file=terraform.tfvars -out=tfplan
 
   - name: 'Terraform Apply'
     shell: bash
+    working-directory: build/infra
     if: inputs.apply_changes == 'true'
     run: terraform apply -auto-approve tfplan
