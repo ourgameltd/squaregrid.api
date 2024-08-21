@@ -20,7 +20,3 @@ runs:
   - name: 'Publish project'
     shell: bash
     run: dotnet publish src/SquareGrid.Api/SquareGrid.Api.csproj --configuration Release --output ./publish
-
-  - name: 'Zip published project'
-    shell: bash
-    run: zip -r functionapp.zip ./publish
