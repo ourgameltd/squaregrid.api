@@ -26,15 +26,20 @@ runs:
     shell: bash
     working-directory: build/infra
     env:
-      environment: ${{ inputs.environment }}
-      b2c_authority: ${{ inputs.b2c_authority }}
-      b2c_issuer: ${{ inputs.b2c_issuer }}
-      b2c_client_id: ${{ inputs.b2c_client_id }}
+      ENV: ${{ inputs.environment }}
+      B2C_AUTHORITY: ${{ inputs.b2c_authority }}
+      B2C_ISSUER: ${{ inputs.b2c_issuer }}
+      B2C_CLIENT_ID: ${{ inputs.b2c_client_id }}
     run: |
-      echo 'environment = "$environment"' > terraform.tfvars
-      echo 'b2c_authority = "$b2c_authority"' >> terraform.tfvars
-      echo 'b2c_issuer = "$b2c_issuer"' >> terraform.tfvars
-      echo 'b2c_client_id = "$b2c_client_id"' >> terraform.tfvars
+      echo "ENV=$ENV" >> $GITHUB_ENV
+      echo "B2C_AUTHORITY=$B2C_AUTHORITY" >> $GITHUB_ENV
+      echo "B2C_ISSUER=$B2C_ISSUER" >> $GITHUB_ENV
+      echo "B2C_CLIENT_ID=$B2C_CLIENT_ID" >> $GITHUB_ENV
+
+      echo "environment=$ENV" > terraform.tfvars
+      echo "b2c_authority=$B2C_AUTHORITY" >> terraform.tfvars
+      echo "b2c_issuer=$B2C_ISSUER" >> terraform.tfvars
+      echo "b2c_client_id=$B2C_CLIENT_ID" >> terraform.tfvars
 
   - name: 'Terraform Init'
     shell: bash
