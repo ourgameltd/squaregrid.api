@@ -31,4 +31,4 @@ jobs:
       - uses: ./.github/templates/deploy
         with:
           function_app_name: ${{ env.FUNCTION_APP_NAME }}
-          package_path: ./publish/functionapp.zip
+          package_path: ./publish
