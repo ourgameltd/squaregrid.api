@@ -31,6 +31,12 @@ runs:
       echo 'b2c_issuer = "${{ inputs.b2c_issuer }}"' >> terraform.tfvars
       echo 'b2c_client_id = "${{ inputs.b2c_client_id }}"' >> terraform.tfvars
 
+  - name: 'TF Config'
+    shell: bash
+    working-directory: build/infra
+    run: |
+      cat terraform.tfvars
+
   - name: 'Terraform Init'
     shell: bash
     working-directory: build/infra
