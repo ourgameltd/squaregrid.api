@@ -10,13 +10,17 @@ runs:
       dotnet-version: '7.x'  # Use the appropriate .NET version
 
   - name: 'Restore dependencies'
+    shell: bash
     run: dotnet restore src/SquareGrid.Api/SquareGrid.Api.csproj
 
   - name: 'Build project'
+    shell: bash
     run: dotnet build src/SquareGrid.Api/SquareGrid.Api.csproj --configuration Release
 
   - name: 'Publish project'
+    shell: bash
     run: dotnet publish src/SquareGrid.Api/SquareGrid.Api.csproj --configuration Release --output ./publish
 
   - name: 'Zip published project'
+    shell: bash
     run: zip -r functionapp.zip ./publish

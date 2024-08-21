@@ -30,6 +30,7 @@ runs:
       creds: ${{ inputs.azure_credentials }}
 
   - name: 'Generate tfvars file'
+    shell: bash
     run: |
       echo 'environment = "${{ inputs.environment }}"' > terraform.tfvars
       echo 'b2c_authority = "${{ inputs.b2c_authority }}"' >> terraform.tfvars
