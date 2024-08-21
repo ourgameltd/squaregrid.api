@@ -10,7 +10,7 @@ on:
 
 jobs:
   terraform:
-    uses: ./.github/templates/terraform.yml
+    uses: ./.github/templates/terraform
     with:
       environment: Dev
       b2c_authority: ${{ env.B2C_AUTHORITY }}
@@ -20,6 +20,6 @@ jobs:
 
   build:
     needs: terraform
-    uses: ./.github/templates/build.yml
+    uses: ./.github/templates/build
     with:
       environment: Dev

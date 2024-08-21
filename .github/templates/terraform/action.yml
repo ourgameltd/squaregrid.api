@@ -1,24 +1,22 @@
 name: Terraform
 
-on:
-  workflow_call:
-    inputs:
-      environment:
-        required: true
-        type: string
-      b2c_authority:
-        required: true
-        type: string
-      b2c_issuer:
-        required: true
-        type: string
-      b2c_client_id:
-        required: true
-        type: string
-      apply_changes:
-        required: true
-        type: boolean
-        default: false
+inputs:
+  environment:
+    required: true
+    type: string
+  b2c_authority:
+    required: true
+    type: string
+  b2c_issuer:
+    required: true
+    type: string
+  b2c_client_id:
+    required: true
+    type: string
+  apply_changes:
+    required: true
+    type: boolean
+    default: false
 
 jobs:
   terraform:
