@@ -64,10 +64,6 @@ runs:
     if: inputs.apply_changes == 'true'
     run: terraform apply -auto-approve
 
-  - name: Print all environment variables
-    shell: bash
-    run: env
-
   - name: 'Create env vars'
     shell: bash
     working-directory: build/infra
