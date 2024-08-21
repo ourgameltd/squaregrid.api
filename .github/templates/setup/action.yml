@@ -2,7 +2,7 @@ name: Setup
 description: Configure environment variables for terraform and azure
 
 inputs:
-  azure_credentials:
+  azure_creds:
     description: Azure creds for Azure CLI
     required: true
 
@@ -13,13 +13,13 @@ runs:
     
     - uses: Azure/login@v1
       with:
-        creds: ${{ inputs.azure_credentials }}
+        creds: ${{ inputs.azure_creds }}
 
     - name: Convert Azure credentials to env vars
       env:
-        AZURE_CREDENTIALS: ${{ inputs.azure_credentials }}
+        AZURE_CREDENTIALS: ${{ inputs.azure_creds }}
       run: | 
-        $servicePrincipal = ($AZURE_CREDENTIALS | ConvertFrom-Json)
+        $servicePrincipal = ($env:AZURE_CREDENTIALS | ConvertFrom-Json)
         $env:ARM_CLIENT_ID = $servicePrincipal.clientId
         $env:ARM_CLIENT_SECRET = $servicePrincipal.clientSecret
         $env:ARM_SUBSCRIPTION_ID = $servicePrincipal.subscriptionId

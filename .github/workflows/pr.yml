@@ -21,7 +21,7 @@ jobs:
       - uses: ./.github/templates/setup
         with:
           environment: Dev
-          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          azure_creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - uses: ./.github/templates/terraform
         with:
