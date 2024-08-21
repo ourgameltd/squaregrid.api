@@ -1,0 +1,75 @@
+name: Terraform
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      b2c_authority:
+        required: true
+        type: string
+      b2c_issuer:
+        required: true
+        type: string
+      b2c_client_id:
+        required: true
+        type: string
+      apply_changes:
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  terraform:
+    name: 'Terraform Plan and Apply'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    
+    steps:
+    - name: 'Checkout code'
+      uses: actions/checkout@v3
+
+    - name: 'Set up Terraform'
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.0
+
+    - name: 'Azure Login'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 'Generate tfvars file'
+      run: |
+        echo 'environment = "${{ inputs.environment }}"' > terraform.tfvars
+        echo 'b2c_authority = "${{ inputs.b2c_authority }}"' >> terraform.tfvars
+        echo 'b2c_issuer = "${{ inputs.b2c_issuer }}"' >> terraform.tfvars
+        echo 'b2c_client_id = "${{ inputs.b2c_client_id }}"' >> terraform.tfvars
+
+    - name: 'Terraform Init'
+      run: terraform init
+
+    - name: 'Terraform Plan'
+      id: tfplan
+      run: terraform plan -var-file=terraform.tfvars -out=tfplan
+
+    - name: 'Terraform Apply'
+      if: inputs.apply_changes == 'true'
+      run: terraform apply -auto-approve tfplan
+
+    - name: 'Extract Outputs'
+      id: outputs
+      run: |
+        terraform output -json > outputs.json
+      if: inputs.apply_changes == 'true' || steps.tfplan.outcome == 'success'
+
+    - name: 'Set Outputs'
+      id: set_outputs
+      if: inputs.apply_changes == 'true' || steps.tfplan.outcome == 'success'
+      run: |
+        echo "::set-output name=function_app_name::$(jq -r '.function_app_name.value' outputs.json)"
+      
+    outputs:
+      function_app_name:
+        value: ${{ steps.set_outputs.outputs.function_app_name }}

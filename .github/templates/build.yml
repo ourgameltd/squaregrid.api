@@ -1,0 +1,39 @@
+name: Build .NET Project
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: 'Build Project'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+    - name: 'Checkout code'
+      uses: actions/checkout@v3
+
+    - name: 'Set up .NET'
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '7.x'  # Use the appropriate .NET version
+
+    - name: 'Restore dependencies'
+      run: dotnet restore src/SquareGrid.Api/SquareGrid.Api.csproj
+
+    - name: 'Build project'
+      run: dotnet build src/SquareGrid.Api/SquareGrid.Api.csproj --configuration Release
+
+    - name: 'Publish project'
+      run: dotnet publish src/SquareGrid.Api/SquareGrid.Api.csproj --configuration Release --output ./publish
+
+    - name: 'Zip published project'
+      run: zip -r functionapp.zip ./publish
+
+    outputs:
+      package_path:
+        value: ./functionapp.zip
