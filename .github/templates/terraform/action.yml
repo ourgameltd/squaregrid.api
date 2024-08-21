@@ -54,14 +54,15 @@ runs:
   - name: 'Terraform Plan'
     shell: bash
     working-directory: build/infra
-    id: tfplan
-    run: terraform plan -var-file=terraform.tfvars -out=tfplan
+    id: plan
+    run: terraform plan -var-file=terraform.tfvars
 
   - name: 'Terraform Apply'
     shell: bash
     working-directory: build/infra
+    id: apply
     if: inputs.apply_changes == 'true'
-    run: terraform apply -auto-approve tfplan
+    run: terraform apply -auto-approve
 
   - name: Print all environment variables
     shell: bash
