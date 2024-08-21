@@ -20,7 +20,7 @@ runs:
   - name: 'Set up Terraform'
     uses: hashicorp/setup-terraform@v2
     with:
-      terraform_version: 1.5.0
+      terraform_version: 1.5.7
 
   - name: 'Generate tfvars file'
     shell: bash
@@ -63,9 +63,14 @@ runs:
     if: inputs.apply_changes == 'true'
     run: terraform apply -auto-approve tfplan
 
+  - name: Print all environment variables
+    shell: bash
+    run: env
+
   - name: 'Create env vars'
     shell: bash
     working-directory: build/infra
     if: inputs.apply_changes == 'true'
     run: |
+      echo $(terraform output -raw function_app_name)
       echo "FUNCTION_APP_NAME=$(terraform output -raw function_app_name)" >> $GITHUB_ENV
