@@ -1,9 +1,11 @@
 name: Build .NET Project
 
-inputs:
-  environment:
-    required: true
-    type: string
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
 
 jobs:
   build:
@@ -34,4 +36,4 @@ jobs:
 
     outputs:
       package_path:
-        value: ./functionapp.zip
+        value: "./functionapp.zip"

@@ -1,15 +1,17 @@
 name: Release to Azure Function App
 
-inputs:
-  environment:
-    required: true
-    type: string
-  function_app_name:
-    required: true
-    type: string
-  package_path:
-    required: true
-    type: string
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      function_app_name:
+        required: true
+        type: string
+      package_path:
+        required: true
+        type: string
 
 jobs:
   release:
