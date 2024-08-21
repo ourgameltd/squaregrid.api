@@ -19,7 +19,7 @@ runs:
       env:
         AZURE_CREDENTIALS: ${{ inputs.azure_credentials }}
       run: | 
-        $servicePrincipal = ($env:AZURE_CREDENTIALS | ConvertFrom-Json)
+        $servicePrincipal = ($AZURE_CREDENTIALS | ConvertFrom-Json)
         $env:ARM_CLIENT_ID = $servicePrincipal.clientId
         $env:ARM_CLIENT_SECRET = $servicePrincipal.clientSecret
         $env:ARM_SUBSCRIPTION_ID = $servicePrincipal.subscriptionId
