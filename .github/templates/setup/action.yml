@@ -16,6 +16,7 @@ runs:
         creds: ${{ inputs.azure_creds }}
 
     - name: Convert Azure credentials to env vars
+      shell: pwsh
       env:
         AZURE_CREDENTIALS: ${{ inputs.azure_creds }}
       run: | 
@@ -29,5 +30,4 @@ runs:
         $env:AZURE_SUBSCRIPTION_ID = $servicePrincipal.subscriptionId
         $env:AZURE_TENANT_ID = $servicePrincipal.tenantId
         Get-ChildItem -Path Env: -Recurse -Include ARM_*,AZURE_* | ForEach-Object {Write-Output "$($_.Name)=$($_.Value)"} >> $env:GITHUB_ENV
-      shell: pwsh
     
