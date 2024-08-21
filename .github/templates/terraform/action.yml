@@ -31,7 +31,7 @@ runs:
       B2C_ISSUER: ${{ inputs.b2c_issuer }}
       B2C_CLIENT_ID: ${{ inputs.b2c_client_id }}
     run: |
-      echo "environment=$ENV" > terraform.tfvars
+      echo "environment="\$ENV\"" > terraform.tfvars
       echo "b2c_authority=\"$B2C_AUTHORITY\"" >> terraform.tfvars
       echo "b2c_issuer=\"$B2C_ISSUER\"" >> terraform.tfvars
       echo "b2c_client_id=\"$B2C_CLIENT_ID\"" >> terraform.tfvars
