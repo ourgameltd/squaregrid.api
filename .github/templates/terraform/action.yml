@@ -34,10 +34,11 @@ runs:
   - name: 'Terraform Init'
     shell: bash
     working-directory: build/infra
-    run: terraform init \
+    run: |
+      terraform init \
       -reconfigure \
-      -backend-config=storage_account_name="terraformogdvtst" \
-      -backend-config=container_name="state-dev" \
+      -backend-config=storage_account_name=terraformogdvtst \
+      -backend-config=container_name=state-dev \
       -backend-config=resource_group_name=Landing-Zones-Default \
       -backend-config=subscription_id=$ARM_SUBSCRIPTION_ID \
       -backend-config=tenant_id=$ARM_TENANT_ID \
