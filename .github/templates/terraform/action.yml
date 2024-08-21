@@ -4,6 +4,8 @@ description: Template - Terraform
 inputs:
   environment:
     required: true
+  azure_credentials:
+    required: true
   b2c_authority:
     required: true
   b2c_issuer:
@@ -28,7 +30,7 @@ runs:
   - name: 'Azure Login'
     uses: azure/login@v1
     with:
-      creds: ${{ secrets.AZURE_CREDENTIALS }}
+      creds: ${{ inputs.azure_credentials }}
 
   - name: 'Generate tfvars file'
     run: |
@@ -59,7 +61,3 @@ runs:
     if: inputs.apply_changes == 'true' || steps.tfplan.outcome == 'success'
     run: |
       echo "::set-output name=function_app_name::$(jq -r '.function_app_name.value' outputs.json)"
-    
-  outputs:
-    function_app_name:
-      value: ${{ steps.set_outputs.outputs.function_app_name }}

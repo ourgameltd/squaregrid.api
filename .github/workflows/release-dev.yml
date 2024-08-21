@@ -16,6 +16,7 @@ jobs:
       - uses: ./.github/templates/terraform
         with:
           environment: Dev
+          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
           b2c_authority: ${{ env.B2C_AUTHORITY }}
           b2c_issuer: ${{ env.B2C_ISSUER }}
           b2c_client_id: ${{ env.B2C_CLIENT_ID }}
@@ -25,5 +26,6 @@ jobs:
 
       - uses: ./.github/templates/deploy
         with:
+          azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
           function_app_name: ${{ needs.terraform.outputs.function_app_name }}
           package_path: ${{ needs.build.outputs.package_path }}

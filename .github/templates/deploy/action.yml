@@ -2,6 +2,8 @@ name: deploy
 description: Template - Deploy
 
 inputs:
+  azure_credentials:
+    required: true
   function_app_name:
     required: true
   package_path:
