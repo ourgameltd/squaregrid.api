@@ -9,17 +9,21 @@ on:
       - hotfix/*
 
 jobs:
-  terraform:
-    uses: ./.github/workflows/terraform.yml
-    with:
-      environment: Dev
-      b2c_authority: ${{ env.B2C_AUTHORITY }}
-      b2c_issuer: ${{ env.B2C_ISSUER }}
-      b2c_client_id: ${{ env.B2C_CLIENT_ID }}
-      apply_changes: false
-
   build:
-    needs: terraform
-    uses: ./.github/workflows/build.yml
-    with:
-      environment: Dev
+    runs-on: ubuntu-latest
+    name: Build
+    environment: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - uses: ./.github/templates/terraform
+        with:
+          environment: Dev
+          b2c_authority: ${{ env.B2C_AUTHORITY }}
+          b2c_issuer: ${{ env.B2C_ISSUER }}
+          b2c_client_id: ${{ env.B2C_CLIENT_ID }}
+          apply_changes: false
+
+      - uses: ./.github/templates/build

@@ -4,25 +4,26 @@ on:
   workflow_dispatch:
 
 jobs:
-  terraform:
-    uses: ./.github/workflows/terraform.yml
-    with:
-      environment: Dev
-      b2c_authority: ${{ env.B2C_AUTHORITY }}
-      b2c_issuer: ${{ env.B2C_ISSUER }}
-      b2c_client_id: ${{ env.B2C_CLIENT_ID }}
-      apply_changes: true
-
   build:
-    needs: terraform
-    uses: ./.github/workflows/build.yml
-    with:
-      environment: Dev
+    runs-on: ubuntu-latest
+    name: Deploy
+    environment: Dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
 
-  release:
-    needs: [build]
-    uses: ./.github/workflows/deploy.yml
-    with:
-      environment: Dev
-      function_app_name: ${{ needs.terraform.outputs.function_app_name }}
-      package_path: ${{ needs.build.outputs.package_path }}
+      - uses: ./.github/templates/terraform
+        with:
+          environment: Dev
+          b2c_authority: ${{ env.B2C_AUTHORITY }}
+          b2c_issuer: ${{ env.B2C_ISSUER }}
+          b2c_client_id: ${{ env.B2C_CLIENT_ID }}
+          apply_changes: true
+
+      - uses: ./.github/templates/build
+
+      - uses: ./.github/templates/deploy
+        with:
+          function_app_name: ${{ needs.terraform.outputs.function_app_name }}
+          package_path: ${{ needs.build.outputs.package_path }}
