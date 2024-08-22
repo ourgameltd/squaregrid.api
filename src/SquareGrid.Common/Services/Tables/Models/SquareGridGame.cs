@@ -46,6 +46,11 @@ namespace SquareGrid.Common.Services.Tables.Models
         [Required]
         public required string Description { get; set; }
 
+        /// <summary>
+        /// Allow only confirmed winners
+        /// </summary>
+        public bool ConfirmedWinnersOnly { get; set; } = false;
+
         public DateTimeOffset? Timestamp { get; set; }
 
         public ETag ETag { get; set; }
@@ -72,7 +77,8 @@ namespace SquareGrid.Common.Services.Tables.Models
                 GroupName = GroupName,
                 ShortName = ShortName,
                 Description = Description,
-                DisplayAsGrid = DisplayAsGrid
+                DisplayAsGrid = DisplayAsGrid,
+                ConfirmedWinnersOnly = ConfirmedWinnersOnly
             };
         }
     }

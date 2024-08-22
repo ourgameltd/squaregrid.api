@@ -80,44 +80,48 @@ namespace SquareGrid.Api.Functions
 
         [OpenApiOperation(operationId: nameof(PutGame), tags: ["game"], Summary = "Create a new game for a logged in user.", Description = "Create a new game for a logged in user.")]
         [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
-        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(SquareGridGame), Description = "A square grid game model.")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Conflict)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Created)]
         [Function(nameof(PutGame))]
-        [Authorize(Policy = "Admin")]
+        [Authorize]
         public async Task<HttpResponseData> PutGame(
             [HttpTrigger(AuthorizationLevel.Function, "put", Route = "games")] HttpRequestData req, FunctionContext ctx)
         {
-            // Get the user and request body and validate it
+            // Get the user
             var user = ctx.GetUser();
-            var data = await req.GetFromBodyValidated<SquareGridGame>();
 
-            if (!data.IsValid)
+            var gameEntitites = await tableManager.GetAllAsync<SquareGridGame>(user.ObjectId);
+            var games = gameEntitites.Select(i => i.ToGame()).ToList();
+
+            // This is a bit shit for now to get the blocks associated with each game, wont take long, but you get what I mean
+            foreach (var game in games)
             {
-                return data.HttpResponseData!;
+                var blockEntities = await tableManager.GetAllAsync<SquareGridBlock>(game.RowKey);
+                var blocks = blockEntities.Select(i => i.ToBlock()).ToList();
+                game.SetBlocks(blocks);
             }
 
-            Game game;
-
-            try
+            if (games.Any(i => i.IsWon == false))
             {
-                // If the game exists, return a conflict
-                game = await GetGameByUserOrThrow(ctx, data.Body!.RowKey);
-
-                if (game != null)
-                {
-                    return req.CreateResponse(HttpStatusCode.Conflict);
-                }
-            }
-            catch (SquareGridException)
-            {
-                logger.LogDebug("Game not found, creating new game.");
+                // You can only have 1 game at a time for now when creating manually
+                return req.CreateResponse(HttpStatusCode.BadRequest);
             }
 
             // Update the record and create the game
-            data.Body!.PartitionKey = user.ObjectId;
-            await tableManager.Insert(data.Body!);
-            return req.CreateResponse(HttpStatusCode.Created);
+            var newGameEntity = new SquareGridGame()
+            {
+                Description = "My new game description.",
+                PartitionKey = user.ObjectId,
+                RowKey = Guid.NewGuid().ToString().ToLower(),
+                Title = "My new game!"
+            };
+
+            await tableManager.Insert(newGameEntity);
+            var newGame = newGameEntity.ToGame();
+
+            var response = req.CreateResponse(HttpStatusCode.Created);
+            await response.WriteAsJsonAsync(newGame);
+            return response;
         }
 
         [OpenApiOperation(operationId: nameof(PostGame), tags: ["game"], Summary = "Updates a game for a user.", Description = "Updates a game for a user.")]
@@ -155,6 +159,7 @@ namespace SquareGrid.Api.Functions
             gameEntity.GroupName = data.Body!.GroupName.GenerateSlug();
             gameEntity.ShortName = data.Body!.ShortName.GenerateSlug();
             gameEntity.DisplayAsGrid = data.Body!.DisplayAsGrid;    
+            gameEntity.ConfirmedWinnersOnly = data.Body!.ConfirmedWinnersOnly;
 
             if (!string.IsNullOrWhiteSpace(image))
             {
@@ -247,6 +252,13 @@ namespace SquareGrid.Api.Functions
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "games/{gameId}/winner")] HttpRequestData req, FunctionContext ctx,
             string gameId)
         {
+            bool confirmedWinnerOnly = false;
+
+            if (bool.TryParse(req.Query["confirmedWinnerOnly"], out bool parsedIsChampion))
+            {
+                confirmedWinnerOnly = parsedIsChampion;
+            }
+
             var user = ctx.GetUser();
 
             Game game;
@@ -270,12 +282,17 @@ namespace SquareGrid.Api.Functions
                 return req.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            if (game.Blocks.All(i => i.IsConfirmed == false))
+            if (game.Blocks.All(i => i.IsClaimed == false))
             {
                 return req.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            var winningBlock = game.PickAWinner();
+            if (confirmedWinnerOnly && game.Blocks.All(i => i.IsConfirmed == false))
+            {
+                return req.CreateResponse(HttpStatusCode.BadRequest);
+            }
+
+            var winningBlock = game.PickAWinner(confirmedWinnerOnly);
 
             if (winningBlock == null)
             {

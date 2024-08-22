@@ -143,9 +143,16 @@ namespace SquareGrid.Common.Models
         /// Pick a winner for this game
         /// </summary>
         /// <returns></returns>
-        public Block? PickAWinner()
+        public Block? PickAWinner(bool confirmedWinnerOnly = false)
         {
             var confirmedBlocks = Blocks.Where(o => o.IsClaimed).ToList();
+
+            // If its only confirmed then do that too 
+
+            if (confirmedWinnerOnly)
+            {
+                confirmedBlocks = confirmedBlocks.Where(i => i.IsConfirmed).ToList();
+            }
 
             if (confirmedBlocks.Count == 0)
             {
@@ -173,5 +180,10 @@ namespace SquareGrid.Common.Models
         /// Display on UI as a grid
         /// </summary>
         public bool DisplayAsGrid { get; set; }
+
+        /// <summary>
+        /// Allow only confirmed winners
+        /// </summary>
+        public bool ConfirmedWinnersOnly { get; set; }
     }
 }
