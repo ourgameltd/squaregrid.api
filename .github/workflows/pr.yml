@@ -14,7 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: Build
-    environment: Dev
+    environment: Live
     steps:
       - uses: actions/checkout@v2
         with:
@@ -22,12 +22,12 @@ jobs:
 
       - uses: ./.github/templates/setup
         with:
-          environment: Dev
+          environment: Live
           azure_creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - uses: ./.github/templates/terraform
         with:
-          environment: Dev
+          environment: Live
           b2c_authority: ${{ vars.B2C_AUTHORITY }}
           b2c_issuer: ${{ vars.B2C_ISSUER }}
           b2c_client_id: ${{ vars.B2C_CLIENT_ID }}
