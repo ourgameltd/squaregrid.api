@@ -25,6 +25,11 @@ variable "environment" {
   default = "Dev"
 } 
 
+variable "laws_name" {
+  type = string
+  default = "lawsogdvtst"
+} 
+
 variable "b2c_authority" {
   type = string
 } 
@@ -57,6 +62,11 @@ locals {
 
 data "azurerm_client_config" "current" {}
 
+data "azurerm_log_analytics_workspace" "logs" {
+  name                = var.laws_name
+  resource_group_name = local.landingZoneRg
+}
+
 ### Resources
 
 resource "azurerm_resource_group" "rg" {
@@ -70,6 +80,7 @@ resource "azurerm_application_insights" "insights" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = local.region
   application_type    = "web"
+  workspace_id        = data.azurerm_log_analytics_workspace.logs.id
   tags = local.tags
 }
 
@@ -94,7 +105,7 @@ resource "azurerm_service_plan" "plan" {
   tags                = local.tags
 }
 
-resource "azurerm_windows_function_app" "api" {
+resource "azurerm_linux_function_app" "api" {
   name                       = "fa${local.suffix}"
   location                   = local.region
   resource_group_name        = azurerm_resource_group.rg.name
@@ -119,7 +130,7 @@ resource "azurerm_windows_function_app" "api" {
     use_32_bit_worker                       = true
 
     application_stack {
-      dotnet_version              = "v7.0"
+      dotnet_version              = "8.0"
       use_dotnet_isolated_runtime = true
     }
   }
@@ -133,5 +144,5 @@ output "instrumentation_key" {
 }
 
 output "function_app_name" {
-  value = azurerm_windows_function_app.api.name
+  value = azurerm_linux_function_app.api.name
 }
