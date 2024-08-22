@@ -1,0 +1,36 @@
+name: PR
+
+on:
+  workflow_dispatch:
+
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+      - release/*
+      - hotfix/*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    environment: Live
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - uses: ./.github/templates/setup
+        with:
+          environment: Live
+          azure_creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - uses: ./.github/templates/terraform
+        with:
+          environment: Live
+          b2c_authority: ${{ vars.B2C_AUTHORITY }}
+          b2c_issuer: ${{ vars.B2C_ISSUER }}
+          b2c_client_id: ${{ vars.B2C_CLIENT_ID }}
+          apply_changes: false
+
+      - uses: ./.github/templates/build

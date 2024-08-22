@@ -354,3 +354,5 @@ __azurite_*.json
 */__azurite_*.json
 
 **/local.settings.json
+
+*.tfvars

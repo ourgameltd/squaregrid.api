@@ -1,0 +1,75 @@
+name: terraform
+description: Template - Terraform
+
+inputs:
+  environment:
+    required: true
+  b2c_authority:
+    required: true
+  b2c_issuer:
+    required: true
+  b2c_client_id:
+    required: true
+  apply_changes:
+    required: true
+    default: false
+
+runs:
+  using: "composite"
+  steps:
+  - name: 'Set up Terraform'
+    uses: hashicorp/setup-terraform@v2
+    with:
+      terraform_wrapper: false
+
+  - name: 'Generate tfvars file'
+    shell: bash
+    working-directory: build/infra
+    env:
+      ENV: ${{ inputs.environment }}
+      B2C_AUTHORITY: ${{ inputs.b2c_authority }}
+      B2C_ISSUER: ${{ inputs.b2c_issuer }}
+      B2C_CLIENT_ID: ${{ inputs.b2c_client_id }}
+    run: |
+      echo "environment=\"$ENV\"" > terraform.tfvars
+      echo "b2c_authority=\"$B2C_AUTHORITY\"" >> terraform.tfvars
+      echo "b2c_issuer=\"$B2C_ISSUER\"" >> terraform.tfvars
+      echo "b2c_client_id=\"$B2C_CLIENT_ID\"" >> terraform.tfvars
+
+  - name: 'Terraform Init'
+    shell: bash
+    working-directory: build/infra
+    env:
+      ENV: ${{ inputs.environment }}
+    run: |
+      terraform init \
+      -reconfigure \
+      -backend-config=storage_account_name=terraformogdvtst \
+      -backend-config=container_name=state-dev \
+      -backend-config=resource_group_name=Landing-Zones-Default \
+      -backend-config=subscription_id=$ARM_SUBSCRIPTION_ID \
+      -backend-config=tenant_id=$ARM_TENANT_ID \
+      -backend-config=client_id=$ARM_CLIENT_ID \
+      -backend-config=client_secret=$ARM_CLIENT_SECRET \
+      -backend-config=key=SquareGrid$ENV.tfstate \
+      -upgrade
+
+  - name: 'Terraform Plan'
+    shell: bash
+    working-directory: build/infra
+    id: plan
+    run: terraform plan -var-file=terraform.tfvars
+
+  - name: 'Terraform Apply'
+    shell: bash
+    working-directory: build/infra
+    id: apply
+    if: inputs.apply_changes == 'true'
+    run: terraform apply -auto-approve
+
+  - name: 'Create env vars'
+    shell: bash
+    working-directory: build/infra
+    if: inputs.apply_changes == 'true'
+    run: |
+      echo "FUNCTION_APP_NAME=$(terraform output -raw function_app_name)" >> $GITHUB_ENV

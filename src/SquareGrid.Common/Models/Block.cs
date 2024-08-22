@@ -1,11 +1,11 @@
 ﻿using Azure;
-using Azure.Data.Tables;
-using SquareGrid.Common.Models;
+using SquareGrid.Common.Services.Tables.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
-namespace SquareGrid.Common.Services.Tables.Models
+namespace SquareGrid.Common.Models
 {
-    public class SquareGridBlock : ITableEntity, IBlock
+    public class Block : IBlock
     {
         /// <summary>
         /// PartitionKey is the RowKey of the SquareGridGame
@@ -47,9 +47,19 @@ namespace SquareGrid.Common.Services.Tables.Models
         public DateTime? DateClaimed { get; set; }
 
         /// <summary>
+        /// Is this claimed
+        /// </summary>
+        public bool IsClaimed => DateClaimed.HasValue;
+
+        /// <summary>
         /// Date the block was confirmed
         /// </summary>
         public DateTime? DateConfirmed { get; set; }
+
+        /// <summary>
+        /// Is this claimed
+        /// </summary>
+        public bool IsConfirmed => DateConfirmed.HasValue;
 
         /// <summary>
         /// Is winner
@@ -58,27 +68,23 @@ namespace SquareGrid.Common.Services.Tables.Models
 
         public DateTimeOffset? Timestamp { get; set; }
 
-        public ETag ETag { get; set; }
+        public string? ETag { get; set; }
 
-        /// <summary>
-        /// Convert to game model
-        /// </summary>
-        /// <returns></returns>
-        public Block ToBlock()
+        public SquareGridBlock ToBlock()
         {
-            return new Block()
+            return new SquareGridBlock()
             {
                 PartitionKey = PartitionKey,
-                ETag = ETag.ToString(),
-                Timestamp = Timestamp,
-                ClaimedByFriendlyName = ClaimedByFriendlyName,
+                RowKey = RowKey,
+                Title = Title,
+                Index = Index,
                 ClaimedByUserId = ClaimedByUserId,
+                ClaimedByFriendlyName = ClaimedByFriendlyName,
                 DateClaimed = DateClaimed,
                 DateConfirmed = DateConfirmed,
-                Index = Index,
                 IsWinner = IsWinner,
-                RowKey = RowKey,
-                Title = Title
+                Timestamp = Timestamp,
+                ETag = string.IsNullOrWhiteSpace(ETag) ? new ETag() : new ETag(ETag) 
             };
         }
     }

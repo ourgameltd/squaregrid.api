@@ -1,10 +1,11 @@
 ﻿using Azure;
 using Azure.Data.Tables;
+using SquareGrid.Common.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace SquareGrid.Common.Services.Tables.Models
 {
-    public class SquareGridGame : ITableEntity
+    public class SquareGridGame : ITableEntity, IGame
     {
         /// <summary>
         /// The UserId from B2C
@@ -30,58 +31,49 @@ namespace SquareGrid.Common.Services.Tables.Models
         public string? Image { get; set; }
 
         /// <summary>
+        /// The group name for the card
+        /// </summary>
+        public string? GroupName { get; set; }
+
+        /// <summary>
+        /// The shortname for the card
+        /// </summary>
+        public string? ShortName { get; set; }
+
+        /// <summary>
         /// A description for the game
         /// </summary>
         [Required]
         public required string Description { get; set; }
 
-        /// <summary>
-        /// Decide if its public
-        /// </summary>
-        public required bool Published { get; set; }
-
-        /// <summary>
-        /// How many blocks does it include
-        /// </summary>
-        public required int Blocks { get; set; }
-
-        /// <summary>
-        /// How many blacks have been claimed by someone
-        /// </summary>
-        public required int BlocksClaimed { get; set; }
-
-        /// <summary>
-        /// How many blocks are left
-        /// </summary>
-        public int BlocksRemaining => Blocks - BlocksClaimed;
-
-        /// <summary>
-        /// Which block was the winner
-        /// </summary>
-        public string? WinnerBlock { get; set; }
-
-        /// <summary>
-        /// Friendly id of registered winner
-        /// </summary>
-        public string? WinnerFriendlyName { get; set; }
-
-        /// <summary>
-        /// User id of registered winner
-        /// </summary>
-        public Guid? WinnerUserId { get; set; }
-
-        /// <summary>
-        /// Is the game complete
-        /// </summary>
-        public bool IsCompleted => BlocksRemaining <= 0;
-
-        /// <summary>
-        /// Does the game have a winner picked
-        /// </summary>
-        public bool IsWon { get; set; } = false;
-
         public DateTimeOffset? Timestamp { get; set; }
 
         public ETag ETag { get; set; }
+
+        /// <summary>
+        /// Display on UI as a grid
+        /// </summary>
+        public bool DisplayAsGrid { get; set; }
+
+        /// <summary>
+        /// Convert to game model
+        /// </summary>
+        /// <returns></returns>
+        public Game ToGame()
+        {
+            return new Game()
+            {
+                ETag = ETag.ToString(),
+                Timestamp = Timestamp,
+                PartitionKey = PartitionKey,
+                RowKey = RowKey,
+                Title = Title,
+                Image = Image,
+                GroupName = GroupName,
+                ShortName = ShortName,
+                Description = Description,
+                DisplayAsGrid = DisplayAsGrid
+            };
+        }
     }
 }

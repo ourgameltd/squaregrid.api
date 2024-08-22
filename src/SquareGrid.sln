@@ -7,11 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SquareGrid.Common", "Square
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SquareGrid.Api", "SquareGrid.Api\SquareGrid.Api.csproj", "{ED6ABDB9-3AA5-4311-B5DD-D4F74BE0BE68}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{CB6D46C8-12B8-4EE6-893C-863FEFB18649}"
-	ProjectSection(SolutionItems) = preProject
-		tests\game.http = tests\game.http
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
