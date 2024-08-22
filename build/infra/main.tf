@@ -2,7 +2,6 @@
 terraform {
   backend "azurerm" {
     resource_group_name  = "Landing-Zones-Default"
-    key                  = "SquareGrid.tfstate"
   }
   required_providers {
     azapi = {
