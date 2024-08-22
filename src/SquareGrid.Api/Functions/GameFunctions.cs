@@ -73,6 +73,7 @@ namespace SquareGrid.Api.Functions
                 game.SetBlocks(blocks);
             }
 
+            games = games.OrderBy(i => i.IsWon).ThenByDescending(i => i.Timestamp).ToList();
             var okResponse = req.CreateResponse(HttpStatusCode.OK);
             await okResponse.WriteAsJsonAsync(games);
             return okResponse;

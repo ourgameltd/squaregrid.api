@@ -49,7 +49,7 @@ namespace SquareGrid.Common.Services.Tables.Models
         /// <summary>
         /// Allow only confirmed winners
         /// </summary>
-        public bool ConfirmedWinnersOnly { get; set; } = false;
+        public bool ConfirmedWinnersOnly { get; set; } = true;
 
         public DateTimeOffset? Timestamp { get; set; }
 
@@ -58,7 +58,7 @@ namespace SquareGrid.Common.Services.Tables.Models
         /// <summary>
         /// Display on UI as a grid
         /// </summary>
-        public bool DisplayAsGrid { get; set; }
+        public bool DisplayAsGrid { get; set; } = true;
 
         /// <summary>
         /// Convert to game model
