@@ -73,7 +73,6 @@ namespace SquareGrid.Api.Functions
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Conflict)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Created)]
         [Function(nameof(AddFriendlyName))]
-        [Authorize]
         public async Task<HttpResponseData> AddFriendlyName(
             [HttpTrigger(AuthorizationLevel.Function, "put", Route = "games/{gameId}/{group}/{friendlyName}")] HttpRequestData req, FunctionContext ctx,
             string gameId,
@@ -87,7 +86,7 @@ namespace SquareGrid.Api.Functions
                 return req.CreateResponse(HttpStatusCode.Conflict);
             }
 
-            var user = ctx.GetUser();
+            var user = await ctx.GetUser();
 
             Game game;
 

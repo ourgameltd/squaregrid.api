@@ -4,19 +4,43 @@ namespace SquareGrid.Common.Models
 {
     public class User
     {
-        public readonly ClaimsPrincipal Principal;
+        public readonly AuthenticatedUser Principal;
 
-        public User(ClaimsPrincipal principal)
+        public User(AuthenticatedUser principal)
         {
             Principal = principal;
         }
 
-        public bool Authenticated => Principal.Identity?.IsAuthenticated ?? false;
+        public bool Authenticated => Principal != null;
 
-        public string Name => Principal.FindFirst("name")?.Value ?? string.Empty;
+        public string Name => Principal.Name;
 
-        public string Email => Principal.FindFirst("emails")?.Value ?? string.Empty;
+        public string? Email => Principal.Email;
 
-        public string ObjectId => Principal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value ?? string.Empty;
+        public string ObjectId => Principal.UserId.ToString().ToLower();
+    }
+
+    public class AuthenticatedUser
+    {
+        public required string IdentityProvider { get; set; }
+
+        public required Guid UserId { get; set; }
+
+        public string Name => Claims.FirstOrDefault(i => i.Typ == "name")?.Val ?? "Unknown";
+
+        public string? Email => Claims.FirstOrDefault(i => i.Typ == "preferred_username")?.Val;
+
+        public string? UserDetails { get; set; }
+
+        public IEnumerable<string>? UserRoles { get; set; }
+
+        public required IEnumerable<AuthenticatedUserClaim> Claims { get; set; }
+    }
+
+    public class AuthenticatedUserClaim
+    {
+        public required string Typ { get; set; }
+
+        public required string Val { get; set; }
     }
 }

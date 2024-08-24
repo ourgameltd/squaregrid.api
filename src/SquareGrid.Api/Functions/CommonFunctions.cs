@@ -36,7 +36,7 @@ namespace SquareGrid.Api.Functions
         {
             if (string.IsNullOrWhiteSpace(userId))
             {
-                var user = ctx.GetUser();
+                var user = await ctx.GetUser();
                 userId = user.ObjectId;
             }
 

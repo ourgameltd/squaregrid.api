@@ -32,7 +32,6 @@ namespace SquareGrid.Api.Functions
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Game), Description = "The square grid game model.")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound)]
         [Function(nameof(GetGame))]
-        [Authorize]
         public async Task<HttpResponseData> GetGame(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "games/{gameId}")] HttpRequestData req, FunctionContext ctx,
             string gameId)
@@ -57,11 +56,10 @@ namespace SquareGrid.Api.Functions
         [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Game[]), Description = "An array of square grid game models.")]
         [Function(nameof(GetGames))]
-        [Authorize]
         public async Task<HttpResponseData> GetGames(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "games")] HttpRequestData req, FunctionContext ctx)
         {
-            var user = ctx.GetUser();
+            var user = await ctx.GetUser();
             var gameEntitites = await tableManager.GetAllAsync<SquareGridGame>(user.ObjectId);
             var games = gameEntitites.Select(i => i.ToGame()).ToList();
 
@@ -84,12 +82,11 @@ namespace SquareGrid.Api.Functions
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Conflict)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Created)]
         [Function(nameof(PutGame))]
-        [Authorize]
         public async Task<HttpResponseData> PutGame(
             [HttpTrigger(AuthorizationLevel.Function, "put", Route = "games")] HttpRequestData req, FunctionContext ctx)
         {
             // Get the user
-            var user = ctx.GetUser();
+            var user = await ctx.GetUser();
 
             var gameEntitites = await tableManager.GetAllAsync<SquareGridGame>(user.ObjectId);
             var games = gameEntitites.Select(i => i.ToGame()).ToList();
@@ -131,12 +128,11 @@ namespace SquareGrid.Api.Functions
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
         [Function(nameof(PostGame))]
-        [Authorize]
         public async Task<HttpResponseData> PostGame(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "games/{gameId}")] HttpRequestData req, FunctionContext ctx,
             string gameId)
         {
-            var user = ctx.GetUser();
+            var user = await ctx.GetUser();
 
             var parser = await MultipartFormDataParser.ParseAsync(req.Body);
             var image = await UploadImageIfPopulated($"images/games/{gameId}", req, ctx, parser);
@@ -248,7 +244,6 @@ namespace SquareGrid.Api.Functions
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Conflict)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest)]
         [Function(nameof(DrawWinner))]
-        [Authorize]
         public async Task<HttpResponseData> DrawWinner(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "games/{gameId}/winner")] HttpRequestData req, FunctionContext ctx,
             string gameId)
@@ -260,7 +255,7 @@ namespace SquareGrid.Api.Functions
                 confirmedWinnerOnly = parsedIsChampion;
             }
 
-            var user = ctx.GetUser();
+            var user = await ctx.GetUser();
 
             Game game;
 

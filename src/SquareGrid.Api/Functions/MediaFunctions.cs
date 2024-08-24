@@ -3,7 +3,6 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using SquareGrid.Api.Utils;
 using SquareGrid.Common.Services.Tables.Models;
-using Microsoft.AspNetCore.Authorization;
 using System.Net;
 using HttpMultipartParser;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
@@ -33,11 +32,10 @@ namespace SquareGrid.Api.Functions
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [Function(nameof(UploadProfileImage))]
-        [Authorize]
         public async Task<HttpResponseData> UploadProfileImage(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "images/user")] HttpRequestData req, FunctionContext ctx)
         {
-            var user = ctx.GetUser();
+            var user = await ctx.GetUser();
             return await UploadImage($"images/users/{user.ObjectId}", req, ctx);
         }
 
@@ -48,12 +46,11 @@ namespace SquareGrid.Api.Functions
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [Function(nameof(UploadGameImage))]
-        [Authorize]
         public async Task<HttpResponseData> UploadGameImage(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "images/game/{gameId}")] HttpRequestData req, FunctionContext ctx,
             string gameId)
         {
-            var user = ctx.GetUser();
+            var user = await ctx.GetUser();
 
             var game = await tableManager.GetAsync<SquareGridGame>(user.ObjectId, gameId);
 

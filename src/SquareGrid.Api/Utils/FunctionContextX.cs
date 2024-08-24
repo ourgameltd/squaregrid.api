@@ -1,64 +1,69 @@
 ﻿using Microsoft.Azure.Functions.Worker;
+using Newtonsoft.Json;
 using SquareGrid.Common.Models;
 using System.Security.Claims;
+using System.Text;
 
 namespace SquareGrid.Api.Utils
 {
     public static class FunctionContextX
     {
-        public static User GetUser(this FunctionContext ctx, bool forceAuthenticated = true)
+        public static async Task<User> GetUser(this FunctionContext ctx)
         {
-            if (ctx == null)
+            var user = await ctx.GetUserIfPopulated();
+
+            if (user == null)
             {
                 throw new ArgumentNullException();
             }
 
-            if (!ctx.Items.TryGetValue(nameof(ClaimsPrincipal), out object? princpal))
-            {
-                throw new InvalidDataException("No user data available in cache.");
-            }
-
-            var claimsPrincipal = princpal as ClaimsPrincipal;
-
-            if (claimsPrincipal == null)
-            {
-                throw new InvalidDataException("No user data available in cache for boxed item.");
-            }
-
-            if (forceAuthenticated && claimsPrincipal.Identity?.IsAuthenticated == false)
-            {
-                throw new InvalidDataException("Claims principal is valid but must be authenticated.");
-            }
-
-            return new User(claimsPrincipal);
+            return user;
         }
 
 
-        public static User? GetUserIfPopulated(this FunctionContext ctx, bool forceAuthenticated = true)
+        public static async Task<User?> GetUserIfPopulated(this FunctionContext ctx)
         {
-            if (ctx == null)
-            {
-                throw new ArgumentNullException();
-            }
+            var req = await ctx.GetHttpRequestDataAsync();
 
-            if (!ctx.Items.TryGetValue(nameof(ClaimsPrincipal), out object? princpal))
+            if (req == null)
             {
                 return null;
             }
 
-            var claimsPrincipal = princpal as ClaimsPrincipal;
+            string? json = null;
 
-            if (claimsPrincipal == null)
+            if (req.Headers.TryGetValues("x-ms-client-principal", out var header))
+            {
+                var data = header.First();
+                var decoded = Convert.FromBase64String(data);
+                json = Encoding.UTF8.GetString(decoded);
+
+#if DEBUG
+                // ML: Mother of all hacks while this bug gets fixed
+                // https://github.com/Azure/static-web-apps/issues/897
+
+                if (string.IsNullOrWhiteSpace(json) && req.Cookies.Any(i => i.Name == "StaticWebAppsAuthCookie"))
+                {
+                    data = req.Cookies.First(i => i.Name == "StaticWebAppsAuthCookie").Value;
+                    decoded = Convert.FromBase64String(data);
+                    json = Encoding.UTF8.GetString(decoded);
+                }
+#endif
+            }
+
+            if (string.IsNullOrWhiteSpace(json))
             {
                 return null;
             }
 
-            if (forceAuthenticated && claimsPrincipal.Identity?.IsAuthenticated == false)
+            AuthenticatedUser? principal = JsonConvert.DeserializeObject<AuthenticatedUser?>(json);
+
+            if (principal == null)
             {
                 return null;
             }
 
-            return new User(claimsPrincipal);
+            return new User(principal);
         }
     }
 }

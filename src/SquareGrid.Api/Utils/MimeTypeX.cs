@@ -1,11 +1,4 @@
-﻿using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Extensions.Primitives;
-using Microsoft.Identity.Client;
-using SquareGrid.Common.Services.Tables.Models;
-using System.ComponentModel.DataAnnotations;
-using System.Net;
-
-namespace SquareGrid.Api.Utils
+﻿namespace SquareGrid.Api.Utils
 {
     public static class MimeTypeX
     {

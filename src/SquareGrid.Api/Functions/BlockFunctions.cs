@@ -32,12 +32,11 @@ namespace SquareGrid.Api
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Created)]
         [Function(nameof(PutBlock))]
-        [Authorize]
         public async Task<HttpResponseData> PutBlock(
             [HttpTrigger(AuthorizationLevel.Function, "put", Route = "games/{gameId}/block")] HttpRequestData req, FunctionContext ctx,
             string gameId)
         {
-            var user = ctx.GetUser();
+            var user = await ctx.GetUser();
             var data = await req.GetFromBodyValidated<PutBlockRequest>();
 
             if (!data.IsValid)
@@ -76,13 +75,12 @@ namespace SquareGrid.Api
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
         [Function(nameof(DeleteBlock))]
-        [Authorize]
         public async Task<HttpResponseData> DeleteBlock(
             [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "games/{gameId}/block/{blockId}")] HttpRequestData req, FunctionContext ctx,
             string gameId,
             string blockId)
         {
-            var user = ctx.GetUser();
+            var user = await ctx.GetUser();
 
             Game game;
 
@@ -111,7 +109,7 @@ namespace SquareGrid.Api
             string gameId,
             string blockId)
         {
-            User? user = ctx.GetUserIfPopulated();
+            User? user = await ctx.GetUserIfPopulated();
             var data = await req.GetFromBodyValidated<ClaimBlockRequest>();
 
             if (!data.IsValid)
@@ -149,14 +147,13 @@ namespace SquareGrid.Api
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
         [Function(nameof(RemoveClaimBlock))]
-        [Authorize]
         public async Task<HttpResponseData> RemoveClaimBlock(
             [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "games/{gameId}/block/{blockId}/claim")] HttpRequestData req, FunctionContext ctx,
             string gameId,
             string blockId)
         {
 
-            User? user = ctx.GetUserIfPopulated();
+            User? user = await ctx.GetUserIfPopulated();
 
             Game game;
 
@@ -191,13 +188,12 @@ namespace SquareGrid.Api
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
         [Function(nameof(ConfirmBlock))]
-        [Authorize]
         public async Task<HttpResponseData> ConfirmBlock(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "games/{gameId}/block/{blockId}/confirm")] HttpRequestData req, FunctionContext ctx,
             string gameId,
             string blockId)
         {
-            User user = ctx.GetUser();
+            User user = await ctx.GetUser();
 
             Game game;
 
