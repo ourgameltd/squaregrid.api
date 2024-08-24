@@ -13,9 +13,7 @@ namespace SquareGrid.Common.Models
 
         public bool Authenticated => Principal != null;
 
-        public string Name => Principal.Name;
-
-        public string? Email => Principal.Email;
+        public string Name => Principal.UserDetails;
 
         public string ObjectId => Principal.UserId.ToString().ToLower();
     }
@@ -30,7 +28,7 @@ namespace SquareGrid.Common.Models
 
         public string? Email => Claims.FirstOrDefault(i => i.Typ == "preferred_username")?.Val;
 
-        public string? UserDetails { get; set; }
+        public required string UserDetails { get; set; }
 
         public IEnumerable<string>? UserRoles { get; set; }
 
