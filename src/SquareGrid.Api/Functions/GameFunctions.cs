@@ -37,7 +37,7 @@ namespace SquareGrid.Api.Functions
 
             try
             {
-                game = await GetGameByUserOrThrow(ctx, gameId);
+                game = await GetGameByUserOrThrow(req, gameId);
             }
             catch (SquareGridException)
             {
@@ -55,7 +55,7 @@ namespace SquareGrid.Api.Functions
         public async Task<HttpResponseData> GetGames(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "games")] HttpRequestData req, FunctionContext ctx)
         {
-            var user = await ctx.GetUser(logger);
+            var user = req.GetUser(logger);
             var gameEntitites = await tableManager.GetAllAsync<SquareGridGame>(user.ObjectId);
             var games = gameEntitites.Select(i => i.ToGame()).ToList();
 
@@ -81,7 +81,7 @@ namespace SquareGrid.Api.Functions
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "games")] HttpRequestData req, FunctionContext ctx)
         {
             // Get the user
-            var user = await ctx.GetUser(logger);
+            var user = req.GetUser(logger);
 
             var gameEntitites = await tableManager.GetAllAsync<SquareGridGame>(user.ObjectId);
             var games = gameEntitites.Select(i => i.ToGame()).ToList();
@@ -126,7 +126,7 @@ namespace SquareGrid.Api.Functions
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "games/{gameId}")] HttpRequestData req, FunctionContext ctx,
             string gameId)
         {
-            var user = await ctx.GetUser();
+            var user = req.GetUser();
 
             var parser = await MultipartFormDataParser.ParseAsync(req.Body);
             var image = await UploadImageIfPopulated($"images/games/{gameId}", req, ctx, parser);
@@ -248,13 +248,13 @@ namespace SquareGrid.Api.Functions
                 confirmedWinnerOnly = parsedIsChampion;
             }
 
-            var user = await ctx.GetUser();
+            var user = req.GetUser();
 
             Game game;
 
             try
             {
-                game = await GetGameByUserOrThrow(ctx, gameId);
+                game = await GetGameByUserOrThrow(req, gameId);
             }
             catch (SquareGridException)
             {

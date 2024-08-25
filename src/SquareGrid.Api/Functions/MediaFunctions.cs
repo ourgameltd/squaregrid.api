@@ -34,7 +34,7 @@ namespace SquareGrid.Api.Functions
         public async Task<HttpResponseData> UploadProfileImage(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "images/user")] HttpRequestData req, FunctionContext ctx)
         {
-            var user = await ctx.GetUser();
+            var user = req.GetUser();
             return await UploadImage($"images/users/{user.ObjectId}", req, ctx);
         }
 
@@ -48,7 +48,7 @@ namespace SquareGrid.Api.Functions
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "images/game/{gameId}")] HttpRequestData req, FunctionContext ctx,
             string gameId)
         {
-            var user = await ctx.GetUser();
+            var user = req.GetUser();
 
             var game = await tableManager.GetAsync<SquareGridGame>(user.ObjectId, gameId);
 

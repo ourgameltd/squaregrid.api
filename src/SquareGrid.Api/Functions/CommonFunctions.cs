@@ -27,16 +27,16 @@ namespace SquareGrid.Api.Functions
         /// <summary>
         /// Gets a agame from the request and validates it belongs to a user
         /// </summary>
-        /// <param name="ctx"></param>
+        /// <param name="req"></param>
         /// <param name="gameId"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
         /// <exception cref="SquareGridException"></exception>
-        protected async Task<Game> GetGameByUserOrThrow(FunctionContext ctx, string gameId, string? userId = null)
+        protected async Task<Game> GetGameByUserOrThrow(HttpRequestData req, string gameId, string? userId = null)
         {
             if (string.IsNullOrWhiteSpace(userId))
             {
-                var user = await ctx.GetUser();
+                var user = req.GetUser();
                 userId = user.ObjectId;
             }
 

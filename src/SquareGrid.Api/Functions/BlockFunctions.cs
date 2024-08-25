@@ -35,7 +35,7 @@ namespace SquareGrid.Api
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "games/{gameId}/block")] HttpRequestData req, FunctionContext ctx,
             string gameId)
         {
-            var user = await ctx.GetUser();
+            var user = req.GetUser();
             var data = await req.GetFromBodyValidated<PutBlockRequest>();
 
             if (!data.IsValid)
@@ -47,7 +47,7 @@ namespace SquareGrid.Api
 
             try
             {
-                game = await GetGameByUserOrThrow(ctx, gameId);
+                game = await GetGameByUserOrThrow(req, gameId);
             }
             catch (SquareGridException)
             {
@@ -78,13 +78,13 @@ namespace SquareGrid.Api
             string gameId,
             string blockId)
         {
-            var user = await ctx.GetUser();
+            var user = req.GetUser();
 
             Game game;
 
             try
             {
-                game = await GetGameByUserOrThrow(ctx, gameId);
+                game = await GetGameByUserOrThrow(req, gameId);
             }
             catch (SquareGridException)
             {
@@ -106,7 +106,7 @@ namespace SquareGrid.Api
             string gameId,
             string blockId)
         {
-            User? user = await ctx.GetUserIfPopulated();
+            User? user = req.GetUserIfPopulated();
             var data = await req.GetFromBodyValidated<ClaimBlockRequest>();
 
             if (!data.IsValid)
@@ -149,13 +149,13 @@ namespace SquareGrid.Api
             string blockId)
         {
 
-            User? user = await ctx.GetUserIfPopulated();
+            User? user = req.GetUserIfPopulated();
 
             Game game;
 
             try
             {
-                game = await GetGameByUserOrThrow(ctx, gameId);
+                game = await GetGameByUserOrThrow(req, gameId);
             }
             catch (SquareGridException)
             {
@@ -188,13 +188,13 @@ namespace SquareGrid.Api
             string gameId,
             string blockId)
         {
-            User user = await ctx.GetUser();
+            User user = req.GetUser();
 
             Game game;
 
             try
             {
-                game = await GetGameByUserOrThrow(ctx, gameId);
+                game = await GetGameByUserOrThrow(req, gameId);
             }
             catch (SquareGridException)
             {

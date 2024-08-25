@@ -59,7 +59,7 @@ namespace SquareGrid.Api.Functions
                 return req.CreateResponse(HttpStatusCode.NotFound);
             }
 
-            Game game = await GetGameByUserOrThrow(ctx, lookup.GameId, lookup.UserId);
+            Game game = await GetGameByUserOrThrow(req, lookup.GameId, lookup.UserId);
 
             var okResponse = req.CreateResponse(HttpStatusCode.OK);
             await okResponse.WriteAsJsonAsync(game);
@@ -83,13 +83,13 @@ namespace SquareGrid.Api.Functions
                 return req.CreateResponse(HttpStatusCode.Conflict);
             }
 
-            var user = await ctx.GetUser();
+            var user = req.GetUser();
 
             Game game;
 
             try
             {
-                game = await GetGameByUserOrThrow(ctx, gameId);
+                game = await GetGameByUserOrThrow(req, gameId);
             }
             catch (SquareGridException)
             {
