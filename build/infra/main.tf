@@ -133,6 +133,12 @@ resource "azurerm_linux_function_app" "api" {
       use_dotnet_isolated_runtime = true
     }
   }
+
+  lifecycle {
+    ignore_changes = [
+      auth_settings_v2, 
+    ]
+  }
 }
 
 ### Output
