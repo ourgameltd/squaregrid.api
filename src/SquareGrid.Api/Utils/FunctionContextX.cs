@@ -66,6 +66,11 @@ namespace SquareGrid.Api.Utils
             if (string.IsNullOrWhiteSpace(json))
             {
                 logger?.LogInformation("No JSON found in cookie or header.");
+                logger?.LogInformation("Headers passed.");
+                foreach (var item in req.Headers)
+                {
+                    logger?.LogInformation(item.Key);
+                }
                 return null;
             }
 
