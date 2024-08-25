@@ -17,7 +17,7 @@ namespace AgkEnergyTransition.Api
 
         [FunctionName("GetRoles")]
         public IActionResult GetRoles(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "GetRoles")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "GetRoles")] HttpRequest req)
         {
             List<string> roles = new List<string>();
 

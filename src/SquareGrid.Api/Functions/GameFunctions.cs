@@ -30,7 +30,7 @@ namespace SquareGrid.Api.Functions
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound)]
         [Function(nameof(GetGame))]
         public async Task<HttpResponseData> GetGame(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "games/{gameId}")] HttpRequestData req, FunctionContext ctx,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "games/{gameId}")] HttpRequestData req, FunctionContext ctx,
             string gameId)
         {
             Game game;
@@ -53,7 +53,7 @@ namespace SquareGrid.Api.Functions
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Game[]), Description = "An array of square grid game models.")]
         [Function(nameof(GetGames))]
         public async Task<HttpResponseData> GetGames(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "games")] HttpRequestData req, FunctionContext ctx)
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "games")] HttpRequestData req, FunctionContext ctx)
         {
             var user = req.GetUser(logger);
             var gameEntitites = await tableManager.GetAllAsync<SquareGridGame>(user.ObjectId);
@@ -78,7 +78,7 @@ namespace SquareGrid.Api.Functions
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Created)]
         [Function(nameof(PutGame))]
         public async Task<HttpResponseData> PutGame(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "games")] HttpRequestData req, FunctionContext ctx)
+            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "games")] HttpRequestData req, FunctionContext ctx)
         {
             // Get the user
             var user = req.GetUser(logger);
@@ -123,7 +123,7 @@ namespace SquareGrid.Api.Functions
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
         [Function(nameof(PostGame))]
         public async Task<HttpResponseData> PostGame(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "games/{gameId}")] HttpRequestData req, FunctionContext ctx,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "games/{gameId}")] HttpRequestData req, FunctionContext ctx,
             string gameId)
         {
             var user = req.GetUser();
@@ -238,7 +238,7 @@ namespace SquareGrid.Api.Functions
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest)]
         [Function(nameof(DrawWinner))]
         public async Task<HttpResponseData> DrawWinner(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "games/{gameId}/winner")] HttpRequestData req, FunctionContext ctx,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "games/{gameId}/winner")] HttpRequestData req, FunctionContext ctx,
             string gameId)
         {
             bool confirmedWinnerOnly = false;
