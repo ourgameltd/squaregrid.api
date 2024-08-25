@@ -55,7 +55,7 @@ namespace SquareGrid.Api.Functions
         public async Task<HttpResponseData> GetGames(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "games")] HttpRequestData req, FunctionContext ctx)
         {
-            var user = await ctx.GetUser();
+            var user = await ctx.GetUser(logger);
             var gameEntitites = await tableManager.GetAllAsync<SquareGridGame>(user.ObjectId);
             var games = gameEntitites.Select(i => i.ToGame()).ToList();
 
@@ -81,7 +81,7 @@ namespace SquareGrid.Api.Functions
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "games")] HttpRequestData req, FunctionContext ctx)
         {
             // Get the user
-            var user = await ctx.GetUser();
+            var user = await ctx.GetUser(logger);
 
             var gameEntitites = await tableManager.GetAllAsync<SquareGridGame>(user.ObjectId);
             var games = gameEntitites.Select(i => i.ToGame()).ToList();
