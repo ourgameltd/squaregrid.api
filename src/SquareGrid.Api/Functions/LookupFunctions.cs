@@ -25,7 +25,6 @@ namespace SquareGrid.Api.Functions
         }
 
         [OpenApiOperation(operationId: nameof(LookupFriendlyName), tags: ["game"], Summary = "Check if a country code and friendly name exists.", Description = "Check if a country code and friendly name exists.")]
-        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound)]
         [Function(nameof(LookupFriendlyName))]
@@ -45,7 +44,6 @@ namespace SquareGrid.Api.Functions
         }
 
         [OpenApiOperation(operationId: nameof(GetGameByFriendlyName), tags: ["game"], Summary = "Get a game by its country and friendly name.", Description = "Get a game by its country and friendly name.")]
-        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Game), Description = "The square grid game model.")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound)]
         [Function(nameof(GetGameByFriendlyName))]
@@ -69,7 +67,6 @@ namespace SquareGrid.Api.Functions
         }
 
         [OpenApiOperation(operationId: nameof(AddFriendlyName), tags: ["game"], Summary = "Add friendly name on a  game for a logged in user.", Description = "Add friendly name on a game for a logged in user.")]
-        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Conflict)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Created)]
         [Function(nameof(AddFriendlyName))]

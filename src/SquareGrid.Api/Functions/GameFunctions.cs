@@ -1,10 +1,8 @@
 using Azure;
 using HttpMultipartParser;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
-using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using SquareGrid.Api.Utils;
@@ -28,7 +26,6 @@ namespace SquareGrid.Api.Functions
         }
 
         [OpenApiOperation(operationId: nameof(GetGame), tags: ["game"], Summary = "Get a game by its user and id.", Description = "Get a game by its user and id.")]
-        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Game), Description = "The square grid game model.")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound)]
         [Function(nameof(GetGame))]
@@ -53,7 +50,6 @@ namespace SquareGrid.Api.Functions
         }
 
         [OpenApiOperation(operationId: nameof(GetGames), tags: ["game"], Summary = "Get all games for the logged in user.", Description = "Get all games for the logged in user.")]
-        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Game[]), Description = "An array of square grid game models.")]
         [Function(nameof(GetGames))]
         public async Task<HttpResponseData> GetGames(
@@ -78,7 +74,6 @@ namespace SquareGrid.Api.Functions
         }
 
         [OpenApiOperation(operationId: nameof(PutGame), tags: ["game"], Summary = "Create a new game for a logged in user.", Description = "Create a new game for a logged in user.")]
-        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Conflict)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Created)]
         [Function(nameof(PutGame))]
@@ -123,7 +118,6 @@ namespace SquareGrid.Api.Functions
         }
 
         [OpenApiOperation(operationId: nameof(PostGame), tags: ["game"], Summary = "Updates a game for a user.", Description = "Updates a game for a user.")]
-        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(Game), Description = "A square grid game model.")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
@@ -238,7 +232,6 @@ namespace SquareGrid.Api.Functions
         }
 
         [OpenApiOperation(operationId: nameof(DrawWinner), tags: ["game"], Summary = "Draw winner for a game for a logged in user.", Description = "Draw winner for a game for a logged in user.")]
-        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Conflict)]

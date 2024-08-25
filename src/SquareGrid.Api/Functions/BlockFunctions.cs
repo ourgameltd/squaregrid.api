@@ -27,7 +27,6 @@ namespace SquareGrid.Api
         }
 
         [OpenApiOperation(operationId: nameof(PutBlock), tags: ["block"], Summary = "Add a block for a game for a logged in user.", Description = "Add a block for a game for a logged in user.")]
-        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(PutBlockRequest), Description = "A request model to add a block.")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Created)]
@@ -71,7 +70,6 @@ namespace SquareGrid.Api
         }
 
         [OpenApiOperation(operationId: nameof(DeleteBlock), tags: ["block"], Summary = "Delete a block on a game for a logged in user.", Description = "Delete a block on a game for a logged in user.")]
-        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
         [Function(nameof(DeleteBlock))]
@@ -98,7 +96,6 @@ namespace SquareGrid.Api
         }
 
         [OpenApiOperation(operationId: nameof(ClaimBlock), tags: ["block"], Summary = "Claim a block on a game.", Description = "Claim a block on a game.")]
-        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(ClaimBlockRequest), Description = "A request model to claim a block thats free.")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Conflict)]
@@ -143,7 +140,6 @@ namespace SquareGrid.Api
         }
 
         [OpenApiOperation(operationId: nameof(RemoveClaimBlock), tags: ["block"], Summary = "Remove claim for block on a game for a logged in user.", Description = "Remove claim for block on a game for a logged in user.")]
-        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
         [Function(nameof(RemoveClaimBlock))]
@@ -183,7 +179,6 @@ namespace SquareGrid.Api
         }
 
         [OpenApiOperation(operationId: nameof(ConfirmBlock), tags: ["block"], Summary = "Confirm a block on a game for a logged in user.", Description = "Conform a block on a game for a logged in user.")]
-        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Forbidden)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest)]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]

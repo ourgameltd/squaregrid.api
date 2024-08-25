@@ -26,7 +26,6 @@ namespace SquareGrid.Api.Functions
         }
 
         [OpenApiOperation(operationId: nameof(UploadProfileImage), tags: ["media"], Summary = "Upload a profile image for a logged in user.", Description = "Upload a profile image for a logged in user.")]
-        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.Created, contentType: "application/json", bodyType: typeof(UploadImageResponse), Description = "Response detailing the saved image location.")]
         [OpenApiRequestBody("multipart/form-data", typeof(FilePart), Required = true, Description = "The image file to upload")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest)]
@@ -40,7 +39,6 @@ namespace SquareGrid.Api.Functions
         }
 
         [OpenApiOperation(operationId: nameof(UploadGameImage), tags: ["media"], Summary = "Upload a game image for a logged in user.", Description = "Upload a game image for a logged in user.")]
-        [OpenApiSecurity("function_auth", SecuritySchemeType.ApiKey, In = OpenApiSecurityLocationType.Header, Name = "x-functions-key")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.Created, contentType: "application/json", bodyType: typeof(UploadImageResponse), Description = "Response detailing the saved image location.")]
         [OpenApiRequestBody("multipart/form-data", typeof(FilePart), Required = true, Description = "The image file to upload")]
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.BadRequest)]
