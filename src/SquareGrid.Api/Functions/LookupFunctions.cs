@@ -29,7 +29,7 @@ namespace SquareGrid.Api.Functions
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NotFound)]
         [Function(nameof(LookupFriendlyName))]
         public async Task<HttpResponseData> LookupFriendlyName(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "games/{group}/{friendlyName}/lookup")] HttpRequestData req, FunctionContext ctx,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "games/{group}/{friendlyName}/lookup")] HttpRequestData req, FunctionContext ctx,
             string group,
             string friendlyName)
         {
@@ -71,7 +71,7 @@ namespace SquareGrid.Api.Functions
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Created)]
         [Function(nameof(AddFriendlyName))]
         public async Task<HttpResponseData> AddFriendlyName(
-            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "games/{gameId}/{group}/{friendlyName}")] HttpRequestData req, FunctionContext ctx,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "games/{gameId}/{group}/{friendlyName}")] HttpRequestData req, FunctionContext ctx,
             string gameId,
             string group,
             string friendlyName)

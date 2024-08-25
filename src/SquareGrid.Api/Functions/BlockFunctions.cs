@@ -32,7 +32,7 @@ namespace SquareGrid.Api
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.Created)]
         [Function(nameof(PutBlock))]
         public async Task<HttpResponseData> PutBlock(
-            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "games/{gameId}/block")] HttpRequestData req, FunctionContext ctx,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "games/{gameId}/block")] HttpRequestData req, FunctionContext ctx,
             string gameId)
         {
             var user = req.GetUser();
@@ -74,7 +74,7 @@ namespace SquareGrid.Api
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
         [Function(nameof(DeleteBlock))]
         public async Task<HttpResponseData> DeleteBlock(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "games/{gameId}/block/{blockId}")] HttpRequestData req, FunctionContext ctx,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "games/{gameId}/block/{blockId}")] HttpRequestData req, FunctionContext ctx,
             string gameId,
             string blockId)
         {
@@ -144,7 +144,7 @@ namespace SquareGrid.Api
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
         [Function(nameof(RemoveClaimBlock))]
         public async Task<HttpResponseData> RemoveClaimBlock(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "games/{gameId}/block/{blockId}/claim")] HttpRequestData req, FunctionContext ctx,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "games/{gameId}/block/{blockId}/claim")] HttpRequestData req, FunctionContext ctx,
             string gameId,
             string blockId)
         {
@@ -184,7 +184,7 @@ namespace SquareGrid.Api
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
         [Function(nameof(ConfirmBlock))]
         public async Task<HttpResponseData> ConfirmBlock(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "games/{gameId}/block/{blockId}/confirm")] HttpRequestData req, FunctionContext ctx,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "games/{gameId}/block/{blockId}/confirm")] HttpRequestData req, FunctionContext ctx,
             string gameId,
             string blockId)
         {
