@@ -102,7 +102,7 @@ namespace SquareGrid.Api
         [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent)]
         [Function(nameof(ClaimBlock))]
         public async Task<HttpResponseData> ClaimBlock(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "claim/game/{gameId}/block/{blockId}")] HttpRequestData req, FunctionContext ctx,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "claim/games/{gameId}/block/{blockId}")] HttpRequestData req, FunctionContext ctx,
             string gameId,
             string blockId)
         {
