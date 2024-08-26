@@ -1,5 +1,4 @@
-﻿using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
+﻿using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SquareGrid.Common.Models;
@@ -46,37 +45,21 @@ namespace SquareGrid.Api.Utils
                     }
                     else
                     {
-                        logger?.LogInformation("Unable to get StaticWebAppsAuthCookie cookie.");
                         return null;
                     }
                 }
 #endif
             }
-            else
-            {
-                logger?.LogInformation("Unable to get x-ms-client-principal header.");
-                logger?.LogInformation("Headers passed.");
-                foreach (var item in req.Headers)
-                {
-                    logger?.LogInformation(item.Key);
-                }
-                return null;
-            }
 
             if (string.IsNullOrWhiteSpace(json))
             {
-                logger?.LogInformation("No JSON found in cookie or header.");
                 return null;
             }
-
-
-            logger?.LogInformation("Got JSON. " + json);
 
             AuthenticatedUser? principal = JsonConvert.DeserializeObject<AuthenticatedUser?>(json);
 
             if (principal == null)
             {
-                logger?.LogInformation("Pricipal is null.");
                 return null;
             }
 
