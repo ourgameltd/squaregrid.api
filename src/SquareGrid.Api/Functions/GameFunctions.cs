@@ -191,6 +191,11 @@ namespace SquareGrid.Api.Functions
                 return req.CreateResponse(HttpStatusCode.Forbidden);
             }
 
+            foreach (var block in gameBlocks)
+            {
+                block.PartitionKey = gameId;
+            }
+
             var blocksDeleted = gameBlocks.Where(i => data.Body.Blocks.All(b => b.RowKey != i.RowKey)).ToList();
             var blocksMatched = gameBlocks.Where(i => data.Body.Blocks.Any(b => b.RowKey == i.RowKey)).ToList();
             var blocksAdded = data.Body.Blocks.Where(i => gameBlocks.All(b => b.RowKey != i.RowKey)).ToList();
@@ -205,6 +210,23 @@ namespace SquareGrid.Api.Functions
                 foreach (var block in blocksMatched)
                 {
                     var blockData = data.Body.Blocks.First(i => i.RowKey == block.RowKey);
+
+                    // If the ETag is different, then the block has been updated since the user last saw it
+
+                    if (blockData.ETag != block.ETag.ToString())
+                    {
+                        var response = req.CreateResponse(HttpStatusCode.Conflict);
+                        await response.WriteStringAsync("Some blocks have ben updated since your edits, please refresh and try again.");
+                        return response;
+                    }
+
+                    // if the new block is the same as the old block, then we can skip it
+
+                    if (block.Equals(blockData))
+                    {
+                        continue;
+                    }
+
                     block.ClaimedByFriendlyName = blockData.ClaimedByFriendlyName;
                     block.ClaimedByUserId = blockData.ClaimedByUserId;
                     block.DateClaimed = blockData.DateClaimed;

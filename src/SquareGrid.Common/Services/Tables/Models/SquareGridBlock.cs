@@ -81,5 +81,24 @@ namespace SquareGrid.Common.Services.Tables.Models
                 Title = Title
             };
         }
+
+        /// <summary>
+        /// Check if its changed
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(IBlock other)
+        {
+            return other != null &&
+                   PartitionKey == other.PartitionKey &&
+                   RowKey == other.RowKey &&
+                   Title == other.Title &&
+                   Index == other.Index &&
+                   ClaimedByUserId == other.ClaimedByUserId &&
+                   ClaimedByFriendlyName == other.ClaimedByFriendlyName &&
+                   DateClaimed == other.DateClaimed &&
+                   DateConfirmed == other.DateConfirmed &&
+                   IsWinner == other.IsWinner;
+        }
     }
 }
