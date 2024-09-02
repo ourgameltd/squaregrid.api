@@ -14,6 +14,7 @@ This is the repo for details the backend API infra for the square grid app.
 * Install dotnet 8
 * VS Code should prompt you to install extensions required in ./.vscode/extensions.json
 * Create local.settings.json file as below in ./src/SquareGrid.Api folder
+* In vscode run Cmd + shift + P and pick: Azurite: Start
 * Hit play on debugger
 * Pick functions process
 
