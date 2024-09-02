@@ -356,3 +356,5 @@ __azurite_*.json
 **/local.settings.json
 
 *.tfvars
+
+__blobstorage__
