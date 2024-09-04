@@ -10,5 +10,29 @@ This is the repo for details the backend API infra for the square grid app.
 
 ## Setup
 
-* Install Visual Studio 2022
+* Install Visual Studio Code
 * Install dotnet 8
+* VS Code should prompt you to install extensions required in ./.vscode/extensions.json
+* Create local.settings.json file as below in ./src/SquareGrid.Api folder
+* In vscode run Cmd + shift + P and pick: Azurite: Start
+* Hit play on debugger
+* Pick functions process
+
+## Settings vars
+
+```json
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "BlobStorageConnection": "UseDevelopmentStorage=true"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information"
+    }
+  }
+}
+
+```
