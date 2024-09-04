@@ -61,6 +61,11 @@ namespace SquareGrid.Common.Services.Tables.Models
         public bool DisplayAsGrid { get; set; } = true;
 
         /// <summary>
+        /// LAyout for the grid
+        /// </summary>
+        public string? GridLayout { get; set; }
+
+        /// <summary>
         /// Convert to game model
         /// </summary>
         /// <returns></returns>
@@ -78,7 +83,8 @@ namespace SquareGrid.Common.Services.Tables.Models
                 ShortName = ShortName,
                 Description = Description,
                 DisplayAsGrid = DisplayAsGrid,
-                ConfirmedWinnersOnly = ConfirmedWinnersOnly
+                ConfirmedWinnersOnly = ConfirmedWinnersOnly,
+                GridLayout = GridLayout,
             };
         }
     }

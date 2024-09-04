@@ -21,5 +21,7 @@ namespace SquareGrid.Common.Models
         string Title { get; set; }
 
         bool DisplayAsGrid { get; set; }
+
+        string? GridLayout { get; set; }
     }
 }

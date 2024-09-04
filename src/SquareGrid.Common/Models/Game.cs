@@ -182,6 +182,11 @@ namespace SquareGrid.Common.Models
         public bool DisplayAsGrid { get; set; }
 
         /// <summary>
+        /// LAyout for the grid
+        /// </summary>
+        public string? GridLayout { get; set; }
+
+        /// <summary>
         /// Allow only confirmed winners
         /// </summary>
         public bool ConfirmedWinnersOnly { get; set; }

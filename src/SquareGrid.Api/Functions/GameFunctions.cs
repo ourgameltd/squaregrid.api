@@ -151,6 +151,7 @@ namespace SquareGrid.Api.Functions
             gameEntity.ShortName = data.Body!.ShortName.GenerateSlug();
             gameEntity.DisplayAsGrid = data.Body!.DisplayAsGrid;    
             gameEntity.ConfirmedWinnersOnly = data.Body!.ConfirmedWinnersOnly;
+            gameEntity.GridLayout = data.Body!.GridLayout;
 
             if (!string.IsNullOrWhiteSpace(image))
             {
