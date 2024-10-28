@@ -2,6 +2,7 @@
 terraform {
   backend "azurerm" {
     resource_group_name  = "Landing-Zones-Default"
+    key="SquareGridLive.tfstate"
   }
   required_providers {
     azapi = {
@@ -15,6 +16,7 @@ provider "azapi" {
 
 provider "azurerm" {
   features {}
+  subscription_id = "a3ac85e7-ff10-4e73-b806-3ab91af8f0c4"
 }
 
 ### Variables
@@ -27,6 +29,11 @@ variable "environment" {
 variable "laws_name" {
   type = string
   default = "lawsogdvtst"
+} 
+
+variable "dns_zone_name" {
+  type = string
+  default = "squaregrid.org"
 } 
 
 variable "b2c_authority" {
@@ -66,6 +73,11 @@ data "azurerm_log_analytics_workspace" "logs" {
   resource_group_name = local.landingZoneRg
 }
 
+data "azurerm_dns_zone" "dns_zone" {
+  name                = var.dns_zone_name
+  resource_group_name = local.landingZoneRg
+}
+
 ### Resources
 
 resource "azurerm_resource_group" "rg" {
@@ -91,6 +103,53 @@ resource "azurerm_storage_account" "storage" {
   account_replication_type = "LRS"
   public_network_access_enabled = true
   tags = local.tags
+
+  static_website {
+    index_document     = "index.html"
+    error_404_document = "404.html"
+  }
+}
+
+####### DNS
+
+resource "azurerm_cdn_profile" "cdn_profile" {
+  name                = "cdn${local.suffix}"
+  location            = local.region
+  resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "Standard_Microsoft"
+}
+
+resource "azurerm_cdn_endpoint" "cdn_endpoint" {
+  name                = "cdnendpoint${local.suffix}"
+  profile_name        = azurerm_cdn_profile.cdn_profile.name
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = local.region
+  is_http_allowed     = false
+  is_https_allowed    = true
+
+  origin {
+    name      = "storage-origin"
+    host_name = "${azurerm_storage_account.storage.primary_web_host}"
+  }
+}
+
+resource "azurerm_dns_cname_record" "link" {
+  name                = "go"
+  zone_name           = data.azurerm_dns_zone.dns_zone.name
+  resource_group_name = data.azurerm_dns_zone.dns_zone.resource_group_name
+  ttl                 = 300
+  target_resource_id  = azurerm_cdn_endpoint.cdn_endpoint.id
+}
+
+resource "azurerm_cdn_endpoint_custom_domain" "link" {
+  name            = "linkdns"
+  cdn_endpoint_id = azurerm_cdn_endpoint.cdn_endpoint.id
+  host_name       = "${azurerm_dns_cname_record.link.name}.${data.azurerm_dns_zone.dns_zone.name}"
+
+  # cdn_managed_https {
+  #   certificate_type = "Dedicated"
+  #   protocol_type    = "ServerNameIndication"
+  # }
 }
 
 ####### Compute
