@@ -173,7 +173,7 @@ resource "azurerm_linux_function_app" "api" {
   tags                       = local.tags
 
   app_settings = {
-    "WEBSITE_RUN_FROM_PACKAGE" = "1"  
+    "WEBSITE_ENABLE_SYNC_UPDATE_SITE" = "true"  
     "BlobStorageConnection" = azurerm_storage_account.storage.primary_connection_string,
     "B2CAuthority": var.b2c_authority,
     "B2CIssuer": var.b2c_issuer,
@@ -196,6 +196,7 @@ resource "azurerm_linux_function_app" "api" {
   lifecycle {
     ignore_changes = [
       auth_settings_v2, 
+      app_settings["WEBSITE_RUN_FROM_PACKAGE"]
     ]
   }
 }
