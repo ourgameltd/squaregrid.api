@@ -28,7 +28,7 @@
 		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.4.0" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="Refit" Version="7.0.0" />
+		<PackageReference Include="Refit" Version="7.2.22" />
 		<PackageReference Include="Refit.HttpClientFactory" Version="7.0.0" />
 		<PackageReference Include="Refit.Newtonsoft.Json" Version="7.0.0" />
 		<PackageReference Include="System.Data.OleDb" Version="7.0.0" />
