@@ -146,10 +146,11 @@ resource "azurerm_cdn_endpoint_custom_domain" "link" {
   cdn_endpoint_id = azurerm_cdn_endpoint.cdn_endpoint.id
   host_name       = "${azurerm_dns_cname_record.link.name}.${data.azurerm_dns_zone.dns_zone.name}"
 
-  # cdn_managed_https {
-  #   certificate_type = "Dedicated"
-  #   protocol_type    = "ServerNameIndication"
-  # }
+  cdn_managed_https {
+    certificate_type = "Dedicated"
+    protocol_type    = "ServerNameIndication"
+    tls_version      = "TLS12"
+  }
 }
 
 ####### Compute
