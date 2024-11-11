@@ -124,9 +124,10 @@ resource "azurerm_cdn_endpoint" "cdn_endpoint" {
   profile_name        = azurerm_cdn_profile.cdn_profile.name
   resource_group_name = azurerm_resource_group.rg.name
   location            = local.region
-  is_http_allowed     = false
+  is_http_allowed     = true
   is_https_allowed    = true
-
+  origin_host_header = "${azurerm_storage_account.storage.primary_web_host}"
+  
   origin {
     name      = "storage-origin"
     host_name = "${azurerm_storage_account.storage.primary_web_host}"
