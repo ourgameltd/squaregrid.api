@@ -1,5 +1,6 @@
 ﻿using Azure.Data.Tables;
 using Azure.Storage.Blobs;
+using Azure.Storage.Queues;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SquareGrid.Common.Services.Tables.Models;
@@ -11,11 +12,15 @@ namespace SquareGrid.Common
         public static IServiceCollection RegisterCommonDependencies(this IServiceCollection services, IConfiguration configuration)
         {
             var connectionString = configuration["BlobStorageConnection"];
+
             var blobServiceClient = new BlobServiceClient(connectionString);
             var containerClient = blobServiceClient.GetBlobContainerClient("media");
             containerClient.CreateIfNotExists();
             services.AddSingleton(blobServiceClient);
             services.AddSingleton(new MediaBlobManager(blobServiceClient));
+            services.AddSingleton(new RedirectBlobManager(blobServiceClient));
+            var queueClient = new QueueClient(connectionString, "redirects");
+            queueClient.CreateIfNotExists();
 
             var tableServiceClient = new TableServiceClient(connectionString);
             var tableGameClient = tableServiceClient.GetTableClient(nameof(SquareGridGame));

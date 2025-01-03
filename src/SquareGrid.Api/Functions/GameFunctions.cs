@@ -1,4 +1,3 @@
-using Azure;
 using HttpMultipartParser;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -17,11 +16,17 @@ namespace SquareGrid.Api.Functions
     public class GameFunctions : CommonFunctions
     {
         private readonly TableManager tableManager;
+        private readonly RedirectBlobManager redirectManager;
         private readonly ILogger<GameFunctions> logger;
 
-        public GameFunctions(TableManager tableManager, MediaBlobManager mediaManager, ILogger<GameFunctions> logger) : base(tableManager, mediaManager, logger)
+        public GameFunctions(
+            TableManager tableManager, 
+            MediaBlobManager mediaManager, 
+            RedirectBlobManager redirectManager, 
+            ILogger<GameFunctions> logger) : base(tableManager, mediaManager, logger)
         {
             this.tableManager = tableManager;
+            this.redirectManager = redirectManager;
             this.logger = logger;
         }
 
@@ -149,13 +154,13 @@ namespace SquareGrid.Api.Functions
             gameEntity.Description = data.Body!.Description;
             gameEntity.GroupName = data.Body!.GroupName.GenerateSlug();
             gameEntity.ShortName = data.Body!.ShortName.GenerateSlug();
-            gameEntity.DisplayAsGrid = data.Body!.DisplayAsGrid;    
+            gameEntity.DisplayAsGrid = data.Body!.DisplayAsGrid;
             gameEntity.ConfirmedWinnersOnly = data.Body!.ConfirmedWinnersOnly;
             gameEntity.GridLayout = data.Body!.GridLayout;
 
             if (!string.IsNullOrWhiteSpace(image))
             {
-               gameEntity.Image = image;
+                gameEntity.Image = image;
             }
 
             if (!string.IsNullOrWhiteSpace(gameEntity.GroupName) && !string.IsNullOrWhiteSpace(gameEntity.ShortName))
@@ -240,8 +245,8 @@ namespace SquareGrid.Api.Functions
                 {
                     var newBlock = block.ToBlock();
                     await tableManager.Insert(newBlock);
-                }       
-                
+                }
+
                 await tableManager.Update(gameEntity);
             }
             catch (Exception e)
@@ -308,7 +313,7 @@ namespace SquareGrid.Api.Functions
 
             if (winningBlock == null)
             {
-               return req.CreateResponse(HttpStatusCode.BadRequest);
+                return req.CreateResponse(HttpStatusCode.BadRequest);
             }
 
             SquareGridBlock? blockEntity = await tableManager.GetAsync<SquareGridBlock>(gameId, winningBlock.RowKey);
@@ -318,6 +323,12 @@ namespace SquareGrid.Api.Functions
             var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(game);
             return response;
+        }
+
+        [Function("RedirectTriggerFunction")]
+        public async Task Run([QueueTrigger("redirects", Connection = "BlobStorageConnection")] RedirectModel redirectModel)
+        {
+            await redirectManager.Upload(redirectModel);
         }
     }
 }
