@@ -248,6 +248,9 @@ namespace SquareGrid.Api.Functions
                 }
 
                 await tableManager.Update(gameEntity);
+
+                // Send message to redirects queue
+                await SendRedirectMessage(gameEntity.Title, gameEntity.Description, gameEntity.Image);
             }
             catch (Exception e)
             {
@@ -257,6 +260,28 @@ namespace SquareGrid.Api.Functions
             }
 
             return req.CreateResponse(HttpStatusCode.NoContent);
+        }
+
+        private async Task SendRedirectMessage(string title, string description, string? image)
+        {
+            // Validate and escape the title, description, and image
+            title = System.Net.WebUtility.HtmlEncode(title);
+            description = System.Net.WebUtility.HtmlEncode(description);
+            image = image != null ? System.Net.WebUtility.HtmlEncode(image) : null;
+
+            // Create a message to send to the redirects queue
+            var redirectModel = new RedirectModel
+            {
+                Title = title,
+                Description = description,
+                Image = image ?? string.Empty,
+                Url = "https://mainwebsite.com/page", // Replace with the actual URL
+                FriendlyUrl = $"{title.GenerateSlug()}/{description.GenerateSlug()}/index.html",
+                Domain = "https://blobstoragecontainer.com"
+            };
+
+            // Send the message to the redirects queue
+            await redirectManager.Upload(redirectModel);
         }
 
         [OpenApiOperation(operationId: nameof(DrawWinner), tags: ["game"], Summary = "Draw winner for a game for a logged in user.", Description = "Draw winner for a game for a logged in user.")]
