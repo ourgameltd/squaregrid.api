@@ -282,7 +282,7 @@ namespace SquareGrid.Api.Functions
                 Title = title,
                 Description = description,
                 Image = image != null ? $"{imageDomain?.TrimEnd('/')}/{image.Trim('/')}" : $"{domain}/images/social.webp",
-                Url = $"/{title.GenerateSlug()}/{description.GenerateSlug()}"
+                Url = $"/{gameEntity.GroupName.GenerateSlug()}/{gameEntity.ShortName.GenerateSlug()}"
             };
 
             // Send the message to the redirects queue
