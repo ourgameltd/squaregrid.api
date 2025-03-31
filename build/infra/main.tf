@@ -185,6 +185,7 @@ resource "azurerm_linux_function_app" "api" {
     "B2CAuthority": var.b2c_authority,
     "B2CIssuer": var.b2c_issuer,
     "B2CClientId": var.b2c_client_id,
+    "WebDomain": "https://squaregrid.org"
   }
 
   site_config {
