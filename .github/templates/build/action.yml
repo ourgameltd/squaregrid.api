@@ -7,7 +7,7 @@ runs:
   - name: 'Set up .NET'
     uses: actions/setup-dotnet@v3
     with:
-      dotnet-version: '7.x'  # Use the appropriate .NET version
+      dotnet-version: '8.x' 
 
   - name: 'Restore dependencies'
     shell: bash
