@@ -185,7 +185,8 @@ resource "azurerm_linux_function_app" "api" {
     "B2CAuthority": var.b2c_authority,
     "B2CIssuer": var.b2c_issuer,
     "B2CClientId": var.b2c_client_id,
-    "WebDomain": "https://squaregrid.org"
+    "WebDomain": "https://${var.dns_zone_name}",
+    "ImageDomain": "https://${azurerm_storage_account.storage.primary_blob_host}"
   }
 
   site_config {

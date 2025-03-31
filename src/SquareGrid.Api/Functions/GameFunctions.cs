@@ -266,17 +266,18 @@ namespace SquareGrid.Api.Functions
 
         private async Task SendRedirectMessage(string title, string description, string? image)
         {
-            // Validate and escape the title, description, and image
             title = WebUtility.HtmlEncode(title);
             description = WebUtility.HtmlEncode(description);
             image = image != null ? WebUtility.HtmlEncode(image) : null;
 
-            // Create a message to send to the redirects queue
+            var domain = Environment.GetEnvironmentVariable("WebDomain")!;
+            var imageDomain = Environment.GetEnvironmentVariable("ImageDomain")!;
+
             var redirectModel = new RedirectModel
             {
                 Title = title,
                 Description = description,
-                Image = image ?? "/images/social.webp",
+                Image = image != null ? $"{imageDomain?.TrimEnd('/')}/{image.Trim('/')}" : $"{domain}/images/social.webp",
                 Url = $"/{title.GenerateSlug()}/{description.GenerateSlug()}"
             };
 

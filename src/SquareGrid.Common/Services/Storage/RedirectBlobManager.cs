@@ -16,14 +16,13 @@ public class RedirectBlobManager
     {
         await this.containerClient.CreateIfNotExistsAsync(PublicAccessType.BlobContainer);
 
-        var domain = Environment.GetEnvironmentVariable("WebDomain");
-        var imageDomain = Environment.GetEnvironmentVariable("ImageDomain");
-        var blobContent = Layouts.Redirect.Replace("{{url}}", $"{domain}/play{model.Url}");
+        var domain = Environment.GetEnvironmentVariable("WebDomain")!;
+        var blobContent = Layouts.Redirect.Replace("{{url}}", $"{domain.TrimEnd('/')}/play/{model.Url.Trim('/')}");
         blobContent = blobContent.Replace("{{title}}", model.Title);
         blobContent = blobContent.Replace("{{description}}", model.Description);
-        blobContent = blobContent.Replace("{{image}}", imageDomain + model.Image);
+        blobContent = blobContent.Replace("{{image}}", model.Image);
 
-        var path = model.Url + "/index.html";
+        var path = model.Url.TrimEnd('/') + "/index.html";
         var blobClient = containerClient.GetBlobClient(path.ToLower());
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(blobContent));
         await blobClient.UploadAsync(stream, new BlobHttpHeaders { ContentType = "text/html" });
