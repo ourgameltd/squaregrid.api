@@ -14,12 +14,16 @@ public class RedirectBlobManager
 
     public async Task Upload(RedirectModel model)
     {
-        var blobContent = Layouts.Redirect.Replace("url", model.Url);
-        blobContent = blobContent.Replace("title", model.Title);
-        blobContent = blobContent.Replace("description", model.Description);
-        blobContent = blobContent.Replace("image", model.Image);
+        await this.containerClient.CreateIfNotExistsAsync(PublicAccessType.BlobContainer);
 
-        var blobClient = containerClient.GetBlobClient(model.FriendlyUrl.ToLower());
+        var domain = Environment.GetEnvironmentVariable("WebDomain")!;
+        var blobContent = Layouts.Redirect.Replace("{{url}}", $"{domain.TrimEnd('/')}/play/{model.Url.Trim('/')}");
+        blobContent = blobContent.Replace("{{title}}", model.Title);
+        blobContent = blobContent.Replace("{{description}}", model.Description);
+        blobContent = blobContent.Replace("{{image}}", model.Image);
+
+        var path = model.Url.TrimEnd('/') + "/index.html";
+        var blobClient = containerClient.GetBlobClient(path.ToLower());
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(blobContent));
         await blobClient.UploadAsync(stream, new BlobHttpHeaders { ContentType = "text/html" });
     }
@@ -31,7 +35,4 @@ public class RedirectModel
     public required string Title { get; set; }
     public required string Description { get; set; }
     public required string Image { get; set; }
-    public required string FriendlyUrl { get; set; }
-    public required string Domain { get; set; }
-    public string FullUrl => string.Join("/", new[] { Domain, FriendlyUrl });
 }

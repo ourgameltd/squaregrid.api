@@ -248,6 +248,11 @@ namespace SquareGrid.Api.Functions
                 }
 
                 await tableManager.Update(gameEntity);
+
+                if (!string.IsNullOrWhiteSpace(gameEntity?.GroupName) && !string.IsNullOrWhiteSpace(gameEntity?.ShortName))
+                {
+                    await SendRedirectMessage(gameEntity.GroupName, gameEntity.ShortName, gameEntity.Image);
+                }
             }
             catch (Exception e)
             {
@@ -257,6 +262,27 @@ namespace SquareGrid.Api.Functions
             }
 
             return req.CreateResponse(HttpStatusCode.NoContent);
+        }
+
+        private async Task SendRedirectMessage(string title, string description, string? image)
+        {
+            title = WebUtility.HtmlEncode(title);
+            description = WebUtility.HtmlEncode(description);
+            image = image != null ? WebUtility.HtmlEncode(image) : null;
+
+            var domain = Environment.GetEnvironmentVariable("WebDomain")!;
+            var imageDomain = Environment.GetEnvironmentVariable("ImageDomain")!;
+
+            var redirectModel = new RedirectModel
+            {
+                Title = title,
+                Description = description,
+                Image = image != null ? $"{imageDomain?.TrimEnd('/')}/{image.Trim('/')}" : $"{domain}/images/social.webp",
+                Url = $"/{title.GenerateSlug()}/{description.GenerateSlug()}"
+            };
+
+            // Send the message to the redirects queue
+            await redirectManager.Upload(redirectModel);
         }
 
         [OpenApiOperation(operationId: nameof(DrawWinner), tags: ["game"], Summary = "Draw winner for a game for a logged in user.", Description = "Draw winner for a game for a logged in user.")]

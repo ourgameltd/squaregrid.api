@@ -5,7 +5,9 @@
       "commandLineArgs": "--port 7059",
       "launchBrowser": false,
       "environmentVariables": {
-        "BlobStorageConnection": "UseDevelopmentStorage=true"
+        "BlobStorageConnection": "UseDevelopmentStorage=true",
+        "WebDomain": "http://localhost:4280",
+        "ImageDomain": "http://127.0.0.1:10000/devstoreaccount1/$web"
       }
     }
   }
