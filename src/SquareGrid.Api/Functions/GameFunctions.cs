@@ -262,7 +262,7 @@ namespace SquareGrid.Api.Functions
 
         private async Task SendRedirectMessage(SquareGridGame gameEntity)
         {
-            if (!string.IsNullOrWhiteSpace(gameEntity.GroupName) && !string.IsNullOrWhiteSpace(gameEntity.ShortName))
+            if (string.IsNullOrWhiteSpace(gameEntity.GroupName) || string.IsNullOrWhiteSpace(gameEntity.ShortName))
             {
                 return;
             }
