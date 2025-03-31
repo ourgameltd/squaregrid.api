@@ -20,9 +20,9 @@ namespace SquareGrid.Api.Functions
         private readonly ILogger<GameFunctions> logger;
 
         public GameFunctions(
-            TableManager tableManager, 
-            MediaBlobManager mediaManager, 
-            RedirectBlobManager redirectManager, 
+            TableManager tableManager,
+            MediaBlobManager mediaManager,
+            RedirectBlobManager redirectManager,
             ILogger<GameFunctions> logger) : base(tableManager, mediaManager, logger)
         {
             this.tableManager = tableManager;
@@ -248,11 +248,7 @@ namespace SquareGrid.Api.Functions
                 }
 
                 await tableManager.Update(gameEntity);
-
-                if (!string.IsNullOrWhiteSpace(gameEntity?.GroupName) && !string.IsNullOrWhiteSpace(gameEntity?.ShortName))
-                {
-                    await SendRedirectMessage(gameEntity.GroupName, gameEntity.ShortName, gameEntity.Image);
-                }
+                await SendRedirectMessage(gameEntity);
             }
             catch (Exception e)
             {
@@ -264,8 +260,16 @@ namespace SquareGrid.Api.Functions
             return req.CreateResponse(HttpStatusCode.NoContent);
         }
 
-        private async Task SendRedirectMessage(string title, string description, string? image)
+        private async Task SendRedirectMessage(SquareGridGame gameEntity)
         {
+            if (!string.IsNullOrWhiteSpace(gameEntity.GroupName) && !string.IsNullOrWhiteSpace(gameEntity.ShortName))
+            {
+                return;
+            }
+
+            var title = gameEntity.Title;
+            var description = gameEntity.Description;
+            var image = gameEntity.Image;
             title = WebUtility.HtmlEncode(title);
             description = WebUtility.HtmlEncode(description);
             image = image != null ? WebUtility.HtmlEncode(image) : null;
