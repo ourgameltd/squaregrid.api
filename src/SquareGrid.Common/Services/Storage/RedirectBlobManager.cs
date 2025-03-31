@@ -14,12 +14,16 @@ public class RedirectBlobManager
 
     public async Task Upload(RedirectModel model)
     {
-        var blobContent = Layouts.Redirect.Replace("{{url}}", model.Url);
+        await this.containerClient.CreateIfNotExistsAsync(PublicAccessType.BlobContainer);
+
+        var domain = Environment.GetEnvironmentVariable("WebDomain");
+        var imageDomain = Environment.GetEnvironmentVariable("ImageDomain");
+        var blobContent = Layouts.Redirect.Replace("{{url}}", $"{domain}/play{model.Url}");
         blobContent = blobContent.Replace("{{title}}", model.Title);
         blobContent = blobContent.Replace("{{description}}", model.Description);
-        blobContent = blobContent.Replace("{{image}}", model.Image);
+        blobContent = blobContent.Replace("{{image}}", imageDomain + model.Image);
 
-        var path = $"{model.GroupName.GenerateSlug()}/{model.CardName.GenerateSlug()}/index.html";
+        var path = model.Url + "/index.html";
         var blobClient = containerClient.GetBlobClient(path.ToLower());
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(blobContent));
         await blobClient.UploadAsync(stream, new BlobHttpHeaders { ContentType = "text/html" });
@@ -32,7 +36,4 @@ public class RedirectModel
     public required string Title { get; set; }
     public required string Description { get; set; }
     public required string Image { get; set; }
-    public required string GroupName { get; set; }
-    public required string CardName { get; set; }
-    public string FullUrl => string.Join("/", new[] { "https://blobstoragecontainer.com", GroupName.GenerateSlug(), CardName.GenerateSlug(), "index.html" });
 }

@@ -249,8 +249,10 @@ namespace SquareGrid.Api.Functions
 
                 await tableManager.Update(gameEntity);
 
-                // Send message to redirects queue
-                await SendRedirectMessage(gameEntity.Title, gameEntity.Description, gameEntity.Image);
+                if (!string.IsNullOrWhiteSpace(gameEntity?.GroupName) && !string.IsNullOrWhiteSpace(gameEntity?.ShortName))
+                {
+                    await SendRedirectMessage(gameEntity.GroupName, gameEntity.ShortName, gameEntity.Image);
+                }
             }
             catch (Exception e)
             {
@@ -265,19 +267,17 @@ namespace SquareGrid.Api.Functions
         private async Task SendRedirectMessage(string title, string description, string? image)
         {
             // Validate and escape the title, description, and image
-            title = System.Net.WebUtility.HtmlEncode(title);
-            description = System.Net.WebUtility.HtmlEncode(description);
-            image = image != null ? System.Net.WebUtility.HtmlEncode(image) : null;
+            title = WebUtility.HtmlEncode(title);
+            description = WebUtility.HtmlEncode(description);
+            image = image != null ? WebUtility.HtmlEncode(image) : null;
 
             // Create a message to send to the redirects queue
             var redirectModel = new RedirectModel
             {
                 Title = title,
                 Description = description,
-                Image = image ?? string.Empty,
-                Url = "https://mainwebsite.com/page", // Replace with the actual URL
-                FriendlyUrl = $"{title.GenerateSlug()}/{description.GenerateSlug()}/index.html",
-                Domain = "https://blobstoragecontainer.com"
+                Image = image ?? "/images/social.webp",
+                Url = $"/{title.GenerateSlug()}/{description.GenerateSlug()}"
             };
 
             // Send the message to the redirects queue
